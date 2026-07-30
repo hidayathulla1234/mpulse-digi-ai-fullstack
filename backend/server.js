@@ -14,6 +14,7 @@ const { RtcTokenBuilder, RtcRole } = require('agora-token');
 const app = express();
 connectDB();
 const PORT = process.env.PORT || 5000;
+const ADMIN_KEY = process.env.ADMIN_KEY || 'mpulseadmin';
 app.set('trust proxy', 1);
 
 // ─────────────────────────────────────────────────────────────
@@ -801,7 +802,7 @@ app.post('/api/mark-installment-paid', async (req, res) => {
 app.get('/api/admin/all-data', async (req, res) => {
   try {
     const { adminKey } = req.query;
-    if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
+    if (!adminKey || adminKey !== ADMIN_KEY) {
       return res.status(403).json({ error: 'Unauthorized. Invalid adminKey.' });
     }
 
