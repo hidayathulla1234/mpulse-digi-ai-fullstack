@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal — MPULSE DIGITAL AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #18181b;
+      --surface-card: #27272a;
+      --violet: #8b5cf6;
+      --violet-light: #a78bfa;
+      --cyan: #06b6d4;
+      --cyan-light: #22d3ee;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --border: rgba(255, 255, 255, 0.08);
+      --success: #10b981;
+      --danger: #ef4444;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      background: rgba(24, 24, 27, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 5%;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .brand-text {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .brand-text span {
+      color: var(--violet);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .user-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .badge-free {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .badge-paid {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: var(--surface-card);
+      color: #fff;
+    }
+
+    /* MAIN APP CONTAINER */
+    .portal-main {
+      flex: 1;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      display: none; /* Shown after login */
+    }
+
+    /* TAB NAV */
+    .tab-nav {
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 30px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 12px 20px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      color: var(--violet-light);
+      border-bottom-color: var(--violet);
+    }
+
+    /* TAB CONTENT */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* HOME TAB */
+    .welcome-card {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.05));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 24px;
+    }
+
+    .welcome-card h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .welcome-card p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .status-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .status-left h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .status-left p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .upgrade-btn {
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-weight: 700;
+      font-size: 13px;
+      border-radius: 100px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .upgrade-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* LOCK COVER & BANNER */
+    .lock-overlay {
+      background: rgba(24, 24, 27, 0.95);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-top: 15px;
+    }
+
+    .lock-icon {
+      font-size: 40px;
+      animation: wiggle 2.5s infinite;
+    }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0); }
+      15% { transform: rotate(-8deg); }
+      30% { transform: rotate(6deg); }
+      45% { transform: rotate(-4deg); }
+      60% { transform: rotate(2deg); }
+    }
+
+    /* LISTS & GRIDS */
+    .list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .item-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      transition: border-color 0.2s;
+    }
+
+    .item-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .item-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .item-meta {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .meta-pill {
+      background: rgba(255,255,255,0.05);
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    .action-btn {
+      background: var(--violet);
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .action-btn:hover {
+      background: var(--violet-light);
+    }
+
+    .action-btn.btn-disabled {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      cursor: not-allowed;
+    }
+
+    /* AUTH OVERLAYS */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 24px;
+      padding: 40px 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .auth-tab.active {
+      color: var(--violet-light);
+      border-bottom-color: var(--violet);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--violet);
+    }
+
+    .auth-submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      color: #fff;
+      border: none;
+      padding: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
+      margin-top: 10px;
+    }
+
+    .auth-error {
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: 12px;
+      text-align: center;
+      display: none;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state h3 {
+      font-family: 'Outfit', sans-serif;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand" onclick="window.location.href='index.html'">
+      <div class="brand-logo">M</div>
+      <div class="brand-text">MPULSE<span>.AI</span></div>
+    </div>
+    <div class="user-profile" id="userHeaderProfile" style="display:none;">
+      <span class="user-badge" id="memberBadge">Free User</span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- PORTAL CONTAINER -->
+  <main class="portal-main" id="portalContainer">
+    
+    <!-- NAVIGATION TABS -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('home', this)">🏠 Dashboard</button>
+      <button class="tab-btn" onclick="switchTab('classes', this)">🔴 Live Classes</button>
+      <button class="tab-btn" onclick="switchTab('recordings', this)">🎬 Recordings</button>
+      <button class="tab-btn" onclick="switchTab('resources', this)">📚 Notes &amp; Resources</button>
+    </div>
+
+    <!-- 1. HOME / DASHBOARD TAB -->
+    <div class="tab-content active" id="tab-home">
+      <div class="welcome-card">
+        <h2 id="welcomeTitle">Welcome, Student!</h2>
+        <p>Your Mpulse Learning Hub dashboard. Below you can check your cohort subscription and access live streaming links.</p>
+      </div>
+
+      <div class="status-box">
+        <div class="status-left">
+          <h3>Membership Status</h3>
+          <p id="membershipDesc">You are currently on a Free account. Upgrade to unlock all live streams and homework materials.</p>
+        </div>
+        <div id="membershipAction">
+          <button class="upgrade-btn" onclick="window.location.href='index.html#courses'">Enroll in Paid Course</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. LIVE CLASSES TAB -->
+    <div class="tab-content" id="tab-classes">
+      <div class="list-container" id="classesList"></div>
+    </div>
+
+    <!-- 3. RECORDINGS TAB -->
+    <div class="tab-content" id="tab-recordings">
+      <div class="list-container" id="recordingsList"></div>
+    </div>
+
+    <!-- 4. RESOURCES TAB -->
+    <div class="tab-content" id="tab-resources">
+      <div class="list-container" id="resourcesList"></div>
+    </div>
+
+  </main>
+
+  <!-- AUTHENTICATION DIALOG (Shown if no session) -->
+  <div class="auth-overlay" id="authDialog">
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchAuthForm('login')">Log In</button>
+        <button class="auth-tab" id="tabSignup" onclick="switchAuthForm('signup')">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div style="position: relative; width: 100%;">
+            <input type="password" id="loginPassword" placeholder="Enter password" style="padding-right: 40px; width: 100%;">
+            <button type="button" onclick="togglePasswordVisibility('loginPassword', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); display: flex; align-items: center; justify-content: center; padding: 4px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-open">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-closed" style="display: none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button class="auth-submit-btn" onclick="submitLogin()">Access Learning Hub</button>
+      </div>
+
+      <!-- Signup Form -->
+      <div id="signupForm" style="display:none;">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="signupName" placeholder="John Doe">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="signupPhone" placeholder="Your mobile number">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div style="position: relative; width: 100%;">
+            <input type="password" id="signupPassword" placeholder="Create password" style="padding-right: 40px; width: 100%;">
+            <button type="button" onclick="togglePasswordVisibility('signupPassword', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); display: flex; align-items: center; justify-content: center; padding: 4px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-open">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-closed" style="display: none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button class="auth-submit-btn" onclick="submitSignup()">Create Account</button>
+      </div>
+
+      <div class="auth-error" id="authErrorMsg"></div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000'
+      : 'https://mpulse-digi-ai-backend.onrender.com';
+    let currentUser = null;
+    let isPaidUser = false;
+
+    // Load active session on start
+    document.addEventListener('DOMContentLoaded', () => {
+      const session = localStorage.getItem('mpulseStudent');
+      if (session) {
+        currentUser = JSON.parse(session);
+        showPortal();
+      }
+    });
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const eyeOpen = btn.querySelector('.eye-open');
+      const eyeClosed = btn.querySelector('.eye-closed');
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeOpen.style.display = 'none';
+        eyeClosed.style.display = 'block';
+      } else {
+        input.type = 'password';
+        eyeOpen.style.display = 'block';
+        eyeClosed.style.display = 'none';
+      }
+    }
+
+    function switchAuthForm(mode) {
+      document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+      document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
+      document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+      document.getElementById('signupForm').style.display = mode === 'signup' ? 'block' : 'none';
+      document.getElementById('authErrorMsg').style.display = 'none';
+    }
+
+    function switchTab(tab, btnEl) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+    }
+
+    function submitLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errorMsg = document.getElementById('authErrorMsg');
+
+      if (!email || !password) {
+        errorMsg.textContent = 'Please fill in all fields.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      fetch(`${BACKEND_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Invalid email or password.');
+        return res.json();
+      })
+      .then(data => {
+        currentUser = data.user;
+        localStorage.setItem('mpulseStudent', JSON.stringify(currentUser));
+        showPortal();
+      })
+      .catch(err => {
+        errorMsg.textContent = err.message;
+        errorMsg.style.display = 'block';
+      });
+    }
+
+    function submitSignup() {
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const phone = document.getElementById('signupPhone').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const errorMsg = document.getElementById('authErrorMsg');
+
+      if (!name || !email || !phone || !password) {
+        errorMsg.textContent = 'All fields are required.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      fetch(`${BACKEND_URL}/api/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, password })
+      })
+      .then(res => {
+        if (!res.ok) return res.json().then(e => { throw new Error(e.error); });
+        return res.json();
+      })
+      .then(data => {
+        currentUser = data.user;
+        localStorage.setItem('mpulseStudent', JSON.stringify(currentUser));
+        showPortal();
+      })
+      .catch(err => {
+        errorMsg.textContent = err.message;
+        errorMsg.style.display = 'block';
+      });
+    }
+
+    function showPortal() {
+      document.getElementById('authDialog').style.display = 'none';
+      document.getElementById('portalContainer').style.display = 'block';
+      document.getElementById('userHeaderProfile').style.display = 'flex';
+      
+      document.getElementById('welcomeTitle').textContent = `Welcome back, ${currentUser.name}!`;
+
+      loadPortalData();
+    }
+
+    function logout() {
+      localStorage.removeItem('mpulseStudent');
+      window.location.reload();
+    }
+
+    function loadPortalData() {
+      fetch(`${BACKEND_URL}/api/student/portal-data?email=${encodeURIComponent(currentUser.email)}`)
+      .then(res => res.json())
+      .then(data => {
+        isPaidUser = data.isPaid;
+        
+        // Update user badge
+        const badge = document.getElementById('memberBadge');
+        badge.className = `user-badge ${isPaidUser ? 'badge-paid' : 'badge-free'}`;
+        badge.textContent = isPaidUser ? 'Paid Member' : 'Free Account';
+
+        // Update home UI card
+        if (isPaidUser) {
+          document.getElementById('membershipDesc').textContent = 'Your Paid Membership is active! You have full access to live classes, recordings, and assignments.';
+          document.getElementById('membershipAction').innerHTML = `<span style="color:var(--success); font-weight:700; font-size:14px;">✨ Access Unlocked</span>`;
+        } else {
+          document.getElementById('membershipDesc').textContent = 'You are currently on a Free account. Upgrade to unlock all live streams and homework materials.';
+          document.getElementById('membershipAction').innerHTML = `<button class="upgrade-btn" onclick="window.location.href='index.html#courses'">Enroll in Paid Course</button>`;
+        }
+
+        renderClasses(data.liveClasses);
+        renderRecordings(data.recordings);
+        renderResources(data.resources);
+      })
+      .catch(err => {
+        console.error('Failed to load portal data:', err);
+      });
+    }
+
+    function renderClasses(list) {
+      const container = document.getElementById('classesList');
+      container.innerHTML = '';
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div class="empty-state"><h3>No Live Classes Scheduled</h3><p>Check back later for updates.</p></div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(c => {
+        const joinBtn = isPaidUser
+          ? `<button class="action-btn" onclick="joinLiveClass('${c.channelName}')">Join Live Stream</button>`
+          : `<button class="action-btn btn-disabled" disabled>🔒 Upgrade to Unlock</button>`;
+
+        return `
+          <div class="item-card">
+            <div class="item-info">
+              <span class="item-title">${c.title}</span>
+              <div class="item-meta">
+                <span>📅 ${c.date}</span>
+                <span>⏰ ${c.time}</span>
+                <span class="meta-pill">${c.status.toUpperCase()}</span>
+              </div>
+            </div>
+            <div>${joinBtn}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderRecordings(list) {
+      const container = document.getElementById('recordingsList');
+      container.innerHTML = '';
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div class="empty-state"><h3>No Recordings Available</h3><p>Class replays will be posted here.</p></div>`;
+        return;
+      }
+
+      if (!isPaidUser) {
+        // Locked overlay cover for free users
+        container.innerHTML = `
+          <div class="lock-overlay">
+            <div class="lock-icon">🔒</div>
+            <h3>Class Recordings Locked</h3>
+            <p style="color:var(--muted); font-size:13px; max-width:300px; margin: 4px auto 12px;">Get unlimited access to all previous class recordings and lectures with a paid cohort membership.</p>
+            <button class="upgrade-btn" onclick="window.location.href='index.html#courses'">Unlock Replays</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(r => {
+        return `
+          <div class="item-card">
+            <div class="item-info">
+              <span class="item-title">${r.title}</span>
+              <div class="item-meta">
+                <span>Class Replay</span>
+              </div>
+            </div>
+            <div>
+              <button class="action-btn" onclick="window.open('${r.videoUrl}', '_blank')">Watch Video 🎬</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderResources(list) {
+      const container = document.getElementById('resourcesList');
+      container.innerHTML = '';
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div class="empty-state"><h3>No Resources Uploaded</h3><p>Files, templates, and PDFs will be shared here.</p></div>`;
+        return;
+      }
+
+      if (!isPaidUser) {
+        // Locked overlay cover for free users
+        container.innerHTML = `
+          <div class="lock-overlay">
+            <div class="lock-icon">🔒</div>
+            <h3>Notes &amp; Homework Materials Locked</h3>
+            <p style="color:var(--muted); font-size:13px; max-width:300px; margin: 4px auto 12px;">Study guides, lecture sheets, code guides, and assignments are only accessible to enrolled students.</p>
+            <button class="upgrade-btn" onclick="window.location.href='index.html#courses'">Unlock Resources</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(f => {
+        return `
+          <div class="item-card">
+            <div class="item-info">
+              <span class="item-title">${f.title}</span>
+              <div class="item-meta">
+                <span class="meta-pill">${f.type.toUpperCase()}</span>
+              </div>
+            </div>
+            <div>
+              <button class="action-btn" onclick="window.open('${f.fileUrl}', '_blank')">Download File 📥</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function joinLiveClass(channel) {
+      // Redirect to class.html with proper params
+      window.location.href = `class.html?channel=${channel}&role=subscriber&name=${encodeURIComponent(currentUser.name)}`;
+    }
+  </script>
+</body>
+</html>

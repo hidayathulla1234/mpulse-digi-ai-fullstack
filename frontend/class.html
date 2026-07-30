@@ -1,0 +1,2998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Meet Room — MPULSE DIGITAL AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #18181b;
+      --surface-card: #27272a;
+      --violet: #8b5cf6;
+      --violet-light: #a78bfa;
+      --cyan: #06b6d4;
+      --cyan-light: #22d3ee;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.15);
+      --success: #10b981;
+      --danger: #ef4444;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      height: 70px;
+      background: rgba(24, 24, 27, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3%;
+      z-index: 10;
+    }
+
+    .class-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .live-badge {
+      background: var(--danger);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      animation: pulseBadge 1.8s infinite;
+    }
+
+    @keyframes pulseBadge {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .class-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .logo-text {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .logo-text span {
+      color: var(--violet);
+    }
+
+    /* LOBBY / PRE-JOIN GREEN ROOM */
+    .lobby-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+
+    .lobby-container {
+      width: 100%;
+      max-width: 900px;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .lobby-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .lobby-preview {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #121214;
+      border-radius: 20px;
+      border: 1px solid var(--border-strong);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+    }
+
+    .lobby-preview-player {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: scaleX(-1);
+    }
+
+    .lobby-preview-controls {
+      position: absolute;
+      bottom: 20px;
+      display: flex;
+      gap: 14px;
+      z-index: 5;
+    }
+
+    .lobby-preview-avatar {
+      font-size: 64px;
+      z-index: 1;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lobby-right {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .lobby-right h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .lobby-right h2 span {
+      background: linear-gradient(135deg, var(--violet-light), var(--cyan-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .lobby-right p {
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.6;
+    }
+
+    .lobby-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .lobby-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .lobby-input-group label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .lobby-input {
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .lobby-input:focus {
+      border-color: var(--violet);
+    }
+
+    .lobby-join-btn {
+      padding: 16px;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      border: none;
+      color: #fff;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(109, 40, 217, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .lobby-join-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(109, 40, 217, 0.45);
+    }
+
+    /* CLASSROOM LAYOUT */
+    .classroom-container {
+      flex: 1;
+      display: none; /* Shown after joining */
+      position: relative;
+      height: calc(100vh - 70px);
+      width: 100%;
+    }
+
+    /* VIDEO ZONE */
+    .video-zone {
+      flex: 1;
+      background: #020205;
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr; /* Default dynamic grid */
+      gap: 20px;
+      padding: 20px;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* LAYOUT SPECIFICS */
+    .video-zone.layout-sidebar {
+      display: grid;
+      grid-template-columns: 3.5fr 1fr;
+      gap: 20px;
+    }
+    
+    .video-zone.layout-sidebar.no-students {
+      grid-template-columns: 1fr;
+    }
+    
+    .video-zone.layout-sidebar #sidebar-videos-area {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .video-zone.layout-spotlight {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    
+    .video-zone.layout-spotlight #sidebar-videos-area {
+      display: none !important;
+    }
+    
+    .video-zone.layout-auto, .video-zone.layout-tiled {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    
+    .video-zone.layout-auto #sidebar-videos-area, 
+    .video-zone.layout-tiled #sidebar-videos-area {
+      display: none !important;
+    }
+
+    #main-presenter-area {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    #sidebar-videos-area {
+      width: 100%;
+      height: 100%;
+      display: none; /* Only visible in Sidebar layout */
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .video-card {
+      position: relative;
+      background: #121214;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      box-shadow: var(--shadow);
+      transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    /* Sidebar Thumbnail layouts */
+    .video-zone.layout-sidebar #main-presenter-area .video-card {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+    }
+
+    .video-zone.layout-sidebar #sidebar-videos-area .video-card {
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .video-card-player {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .video-card-player video {
+      object-fit: cover !important;
+    }
+
+    .video-card-name {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(12px);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .video-card-avatar {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      background: #141416;
+    }
+
+    .video-card-avatar-inner {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(109, 40, 217, 0.3);
+    }
+
+    .video-card-muted-icon {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(239, 68, 68, 0.9);
+      color: #fff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      z-index: 5;
+      box-shadow: 0 2px 12px rgba(239, 68, 68, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .video-card-hand-raised {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(245, 158, 11, 0.95);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      z-index: 5;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      animation: bounceIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes bounceIn {
+      from { transform: scale(0.3); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* CONTROLS BAR */
+    .controls-bar {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 23, 0.85);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border-strong);
+      border-radius: 24px;
+      padding: 12px 24px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    .control-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--surface-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .control-btn:hover {
+      background: var(--surface);
+      transform: scale(1.05);
+    }
+
+    .control-btn.active {
+      background: rgba(139, 92, 246, 0.25);
+      border-color: var(--violet);
+      color: var(--violet-light);
+    }
+
+    .control-btn.disabled {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .control-btn.leave-btn {
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      font-size: 20px;
+    }
+
+    .control-btn.leave-btn:hover {
+      background: #dc2626;
+      transform: scale(1.08);
+    }
+
+    /* MORE OPTIONS MENU */
+    .more-menu {
+      position: absolute;
+      bottom: 95px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: var(--shadow);
+      z-index: 200;
+      width: 210px;
+    }
+
+    .more-menu button {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 13.5px;
+      font-family: inherit;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s;
+    }
+
+    .more-menu button:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* MOBILE / PORTRAIT ADAPTATIONS */
+    @media (max-width: 600px) {
+      /* Hide desktop-only controls from toolbar to prevent cut-off */
+      #screenBtn, #handBtn, #rosterToggleBtn, #chatToggleBtn, #fullscreenBtn {
+        display: none !important;
+      }
+
+      /* Stack video cards vertically on mobile */
+      .video-zone {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: 2.5fr 1fr;
+        gap: 12px;
+      }
+      
+      #sidebar-videos-area {
+        flex-direction: row !important;
+        overflow-x: auto;
+        overflow-y: hidden;
+        height: auto;
+      }
+
+      #sidebar-videos-area .video-card {
+        width: 140px;
+        height: 80px;
+      }
+
+      .controls-bar {
+        padding: 8px 16px;
+        gap: 8px;
+        border-radius: 16px;
+        bottom: 20px;
+      }
+
+      .control-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 16px;
+      }
+
+      .mobile-menu-item {
+        display: flex !important;
+      }
+    }
+
+    @media (min-width: 601px) {
+      /* Hide adaptive mobile controls in the dropdown for desktop view */
+      .mobile-menu-item {
+        display: none !important;
+      }
+    }
+
+    /* SIDE PANEL */
+    .side-panel {
+      width: 360px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: none; /* Hidden by default togglable like Google Meet */
+      flex-direction: column;
+      z-index: 5;
+      height: 100%;
+    }
+
+    .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-tab {
+      flex: 1;
+      padding: 18px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      text-align: center;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .panel-tab.active {
+      color: var(--violet-light);
+      border-bottom-color: var(--violet);
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    /* CHAT PANEL */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .message-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      animation: msgIn 0.3s ease-out;
+    }
+
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .msg-sender {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--violet-light);
+    }
+
+    .msg-sender.teacher {
+      color: var(--cyan-light);
+    }
+
+    .msg-text {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text);
+      max-width: 90%;
+      word-break: break-word;
+    }
+
+    .chat-input-area {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input:focus {
+      border-color: var(--violet);
+    }
+
+    .chat-send-btn {
+      background: var(--violet);
+      color: #fff;
+      border: none;
+      padding: 0 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .chat-send-btn:hover {
+      background: var(--violet-light);
+    }
+
+    /* PARTICIPANTS PANEL */
+    .roster-container {
+      display: none;
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .roster-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .roster-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      color: #fff;
+    }
+
+    .roster-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .roster-role {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 100px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+    }
+
+    .roster-role.teacher {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--cyan-light);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+    }
+
+    .roster-perm-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    .roster-perm-btn.allowed {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--success);
+      color: var(--success);
+    }
+    .roster-perm-btn.blocked {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* COLLABORATIVE WHITEBOARD MODAL */
+    .whiteboard-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      z-index: 5000;
+      flex-direction: column;
+      gap: 14px;
+      width: 95vw;
+      max-width: 900px;
+    }
+
+    .whiteboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .whiteboard-header h3 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+    }
+
+    .whiteboard-close {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    #whiteboardCanvas {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      cursor: crosshair;
+      width: 100%;
+      aspect-ratio: 16/10;
+    }
+
+    .whiteboard-toolbar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .whiteboard-toolbar button {
+      padding: 8px 16px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* ── ADJUST VIEW MODAL STYLES ── */
+    .adjust-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 6000;
+    }
+    
+    .adjust-modal {
+      background: #ffffff;
+      color: #202124;
+      border-radius: 16px;
+      padding: 24px 28px;
+      width: 360px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      font-family: 'DM Sans', sans-serif;
+    }
+    
+    .adjust-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    
+    .adjust-modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #202124;
+      font-family: 'Outfit', sans-serif;
+    }
+    
+    .adjust-modal-subtitle {
+      font-size: 13px;
+      color: #5f6368;
+      margin-top: 2px;
+    }
+    
+    .adjust-modal-close {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #5f6368;
+      font-size: 18px;
+      padding: 4px;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+    
+    .adjust-modal-close:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .adjust-layout-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .adjust-layout-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    
+    .adjust-layout-row:hover {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    
+    .adjust-radio-outer {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.2s;
+    }
+    
+    .adjust-radio-outer.selected {
+      border-color: #1a73e8;
+    }
+    
+    .adjust-radio-inner {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #1a73e8;
+    }
+    
+    .adjust-layout-label {
+      flex: 1;
+      font-size: 14px;
+      color: #202124;
+      font-weight: 400;
+    }
+    
+    .adjust-layout-label.selected {
+      font-weight: 600;
+    }
+    
+    .adjust-preview-box {
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 3px;
+      background: #f8f9fa;
+      display: flex;
+    }
+    
+    .adjust-divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 16px 0;
+    }
+    
+    .adjust-tiles-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #202124;
+      margin-bottom: 2px;
+    }
+    
+    .adjust-tiles-subtitle {
+      font-size: 12px;
+      color: #5f6368;
+      margin-bottom: 10px;
+    }
+    
+    .adjust-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .adjust-slider {
+      flex: 1;
+      accent-color: #1a73e8;
+      cursor: pointer;
+    }
+    
+    .adjust-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .adjust-toggle-label {
+      font-size: 14px;
+      color: #202124;
+    }
+    
+    .adjust-toggle-switch {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: #ccc;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .adjust-toggle-switch.active {
+      background: #1a73e8;
+    }
+    
+    .adjust-toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .adjust-toggle-switch.active .adjust-toggle-knob {
+      transform: translateX(20px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="class-info">
+      <div class="live-badge" id="liveBadge">LIVE</div>
+      <div class="class-title" id="classTitle">Classroom: Connection Pending</div>
+    </div>
+    <div class="logo-text">MPULSE<span>.AI</span></div>
+  </header>
+
+  <!-- LOBBY SCREEN -->
+  <div class="lobby-screen" id="lobbyScreen">
+    <div class="lobby-container">
+      <div class="lobby-left">
+        <div class="lobby-preview">
+          <div class="lobby-preview-player" id="lobbyPreviewPlayer"></div>
+          <div class="lobby-preview-avatar" id="lobbyPreviewAvatar">🙋‍♂️</div>
+          <div class="lobby-preview-controls">
+            <button class="control-btn" id="lobbyMicBtn" onclick="toggleLobbyMic()">🎙️</button>
+            <button class="control-btn" id="lobbyCamBtn" onclick="toggleLobbyCam()">📷</button>
+          </div>
+        </div>
+      </div>
+      <div class="lobby-right">
+        <h2>Ready to join your <span>Interactive Classroom</span>?</h2>
+        <p>Confirm your video and audio settings before joining the live session. Make sure your camera and microphone permissions are enabled.</p>
+        
+        <div class="lobby-form">
+          <div class="lobby-input-group">
+            <label for="lobbyNameInput">Your Display Name</label>
+            <input type="text" class="lobby-input" id="lobbyNameInput" placeholder="Enter your full name...">
+          </div>
+          <button class="lobby-join-btn" onclick="requestToJoinClassroom()">
+            Join Meeting 🚀
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAITING ROOM SCREEN -->
+  <div class="lobby-screen" id="waitingRoomScreen" style="display: none; text-align: center; justify-content: center; align-items: center; z-index: 3000;">
+    <div style="max-width: 450px; background: var(--surface); padding: 40px; border-radius: 24px; border: 1px solid var(--border-strong); box-shadow: var(--shadow);">
+      <div id="waitingSpinner" style="font-size: 54px; margin-bottom: 20px;">⏳</div>
+      <h2 style="font-family:'Outfit',sans-serif; margin-bottom: 12px; font-weight:800;">Waiting Room</h2>
+      <p id="waitingRoomMsg" style="color: var(--muted); font-size:14.5px; line-height: 1.6; margin-bottom: 24px;">Please wait. The teacher/host has been notified that you are knocking. You will be admitted shortly...</p>
+      <button class="lobby-join-btn" style="background: var(--danger); box-shadow: none;" onclick="leaveChannel()">Cancel Request ❌</button>
+    </div>
+  </div>
+
+  <!-- CLASSROOM CONTAINER -->
+  <div class="classroom-container" id="classroomContainer">
+
+    <!-- VIDEO ZONE -->
+    <div class="video-zone">
+      <div id="main-presenter-area"></div>
+      <div id="sidebar-videos-area"></div>
+
+      <!-- CLOSED CAPTIONS OVERLAY -->
+      <div id="closedCaptionsArea" style="position: absolute; bottom: 95px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 600px; text-align: center; pointer-events: none; z-index: 150; display: none;">
+        <span id="closedCaptionsText" style="background: rgba(0,0,0,0.85); color: #fff; padding: 6px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; border: 1px solid rgba(255,255,255,0.1); line-height: 1.5; text-shadow: 1px 1px 2px #000;"></span>
+      </div>
+
+      <!-- CONTROLS BAR -->
+      <div class="controls-bar">
+        <button class="control-btn" id="micBtn" onclick="toggleMic()" title="Mute/Unmute Mic">🎙️</button>
+        <button class="control-btn" id="camBtn" onclick="toggleCam()" title="Toggle Camera">📷</button>
+        <button class="control-btn" id="screenBtn" onclick="toggleScreenShare()" title="Share Screen">🖥️</button>
+        <button class="control-btn" id="handBtn" onclick="toggleRaiseHand()" title="Raise Hand">✋</button>
+        <button class="control-btn" id="moreBtn" onclick="toggleMoreMenu()" title="More Options">⋮</button>
+        <button class="control-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+        <button class="control-btn leave-btn" id="leaveBtn" onclick="leaveChannel()" title="End Call">☎️</button>
+        
+        <!-- Toggle Chat/Roster buttons in Google Meet Toolbar -->
+        <button class="control-btn" id="rosterToggleBtn" onclick="toggleSidePanel('roster')" title="View Participants">👥</button>
+        <button class="control-btn" id="chatToggleBtn" onclick="toggleSidePanel('chat')" title="In-Meeting Chat">💬</button>
+      </div>
+
+      <!-- MORE OPTIONS DROPDOWN -->
+      <div class="more-menu" id="moreMenu" style="display: none;">
+        <!-- Recording (Teacher only) -->
+        <button id="recordMenuBtn" onclick="triggerLocalRecord()"><span id="recordMenuLabel">📹 Record Meeting</span></button>
+        <!-- Drawing Board -->
+        <button onclick="toggleWhiteboard()"><span id="whiteboardMenuLabel">🎨 Open Whiteboard</span></button>
+        
+        <!-- Mobile adaptive items (Visible on phone instead of the toolbar items) -->
+        <button class="mobile-menu-item" id="menuChatBtn" onclick="toggleSidePanelFromMenu('chat')">💬 Live Chat</button>
+        <button class="mobile-menu-item" id="menuRosterBtn" onclick="toggleSidePanelFromMenu('roster')">👥 Students List</button>
+        <button class="mobile-menu-item" id="menuScreenBtn" onclick="toggleScreenShareFromMenu()">🖥️ Share Screen</button>
+        <button class="mobile-menu-item" id="menuHandBtn" onclick="toggleRaiseHandFromMenu()">✋ Raise Hand</button>
+        <button class="mobile-menu-item" id="menuFullscreenBtn" onclick="toggleFullscreenFromMenu()">⛶ Fullscreen</button>
+        
+        <button onclick="openAdjustViewModal()">🖼️ Adjust view</button>
+        <button onclick="alert('Camera: Default Video Device\nMicrophone: Default Audio Input')">⚙️ Settings</button>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div class="side-panel">
+      <div class="panel-tabs">
+        <button class="panel-tab active" id="tabChat" onclick="switchPanel('chat')">Live Chat</button>
+        <button class="panel-tab" id="tabRoster" onclick="switchPanel('roster')">Students (0)</button>
+        <button class="panel-tab" id="tabSummary" onclick="switchPanel('summary')" style="display: none;">AI Summary</button>
+      </div>
+
+      <!-- CHAT CONTAINER -->
+      <div class="chat-container" id="panelChatContent">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+          <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question..." onkeydown="if(event.key==='Enter') sendMsg()">
+          <button class="chat-send-btn" onclick="sendMsg()">Send</button>
+        </div>
+      </div>
+
+      <!-- ROSTER CONTAINER -->
+      <div class="roster-container" id="panelRosterContent" style="display: none; flex-direction: column; gap: 12px;">
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px;">HOST PERMISSIONS</span>
+        </div>
+        <div id="rosterList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      </div>
+
+      <!-- SUMMARY CONTAINER -->
+      <div class="chat-container" id="panelSummaryContent" style="display: none; padding: 20px; overflow-y: auto; flex-direction: column; gap: 16px;">
+        <button onclick="generateAISummary()" style="background: var(--violet); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer;">
+          ✨ Generate AI Summary
+        </button>
+        <div id="summaryResult" style="font-size: 13px; line-height: 1.6; color: var(--text); white-space: pre-wrap; font-family: inherit; background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 14px; border-radius: 10px;">
+          Click the button above to analyze classroom transcriptions and generate a structured markdown summary.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COLLABORATIVE WHITEBOARD MODAL -->
+  <div class="whiteboard-modal" id="whiteboardModal" style="display: none;">
+    <div class="whiteboard-header">
+      <h3>Interactive Whiteboard</h3>
+      <button class="whiteboard-close" onclick="toggleWhiteboard()">❌</button>
+    </div>
+    <canvas id="whiteboardCanvas"></canvas>
+    <div class="whiteboard-toolbar">
+      <button onclick="clearWhiteboard()">Clear Canvas</button>
+      <label style="font-size:12px;">Brush Color:</label>
+      <input type="color" id="whiteboardColor" value="#8b5cf6">
+      <label style="font-size:12px;">Brush Size:</label>
+      <input type="range" id="whiteboardBrush" min="2" max="20" value="5">
+    </div>
+  </div>
+
+  <!-- ADJUST VIEW MODAL (Google Meet Style) -->
+  <div class="adjust-modal-overlay" id="adjustViewModal" style="display: none;" onclick="closeAdjustViewModal()">
+    <div class="adjust-modal" onclick="event.stopPropagation()">
+      <div class="adjust-modal-header">
+        <div>
+          <div class="adjust-modal-title">Adjust view</div>
+          <div class="adjust-modal-subtitle">Selection is saved for future meetings</div>
+        </div>
+        <button class="adjust-modal-close" onclick="closeAdjustViewModal()">❌</button>
+      </div>
+
+      <div class="adjust-layout-list">
+        <!-- Auto (dynamic) -->
+        <label class="adjust-layout-row" onclick="selectLayoutPreset('auto')">
+          <div class="adjust-radio-outer" id="radio-auto">
+            <div class="adjust-radio-inner" id="radio-inner-auto" style="display: none;"></div>
+          </div>
+          <span class="adjust-layout-label" id="label-auto">Auto (dynamic) ✨</span>
+          <div class="adjust-preview-box">
+            <svg width="52" height="36" viewBox="0 0 52 36" fill="none">
+              <rect x="1" y="1" width="23" height="16" rx="2" fill="#ccc"/>
+              <rect x="27" y="1" width="24" height="16" rx="2" fill="#ccc"/>
+              <rect x="1" y="20" width="15" height="15" rx="2" fill="#ddd"/>
+              <rect x="19" y="20" width="15" height="15" rx="2" fill="#ddd"/>
+              <rect x="37" y="20" width="14" height="15" rx="2" fill="#ddd"/>
+            </svg>
+          </div>
+        </label>
+
+        <!-- Tiled (legacy) -->
+        <label class="adjust-layout-row" onclick="selectLayoutPreset('tiled')">
+          <div class="adjust-radio-outer" id="radio-tiled">
+            <div class="adjust-radio-inner" id="radio-inner-tiled" style="display: none;"></div>
+          </div>
+          <span class="adjust-layout-label" id="label-tiled">Tiled (legacy)</span>
+          <div class="adjust-preview-box">
+            <svg width="52" height="36" viewBox="0 0 52 36" fill="none">
+              <rect x="1" y="1" width="16" height="10" rx="1.5" fill="#ccc"/>
+              <rect x="18" y="1" width="16" height="10" rx="1.5" fill="#ccc"/>
+              <rect x="35" y="1" width="16" height="10" rx="1.5" fill="#ccc"/>
+              <rect x="1" y="12" width="16" height="10" rx="1.5" fill="#ccc"/>
+              <rect x="18" y="12" width="16" height="10" rx="1.5" fill="#ccc"/>
+              <rect x="35" y="12" width="16" height="10" rx="1.5" fill="#ccc"/>
+              <rect x="1" y="23" width="16" height="10" rx="1.5" fill="#ccc"/>
+              <rect x="18" y="23" width="16" height="10" rx="1.5" fill="#ccc"/>
+              <rect x="35" y="23" width="16" height="10" rx="1.5" fill="#ccc"/>
+            </svg>
+          </div>
+        </label>
+
+        <!-- Spotlight -->
+        <label class="adjust-layout-row" onclick="selectLayoutPreset('spotlight')">
+          <div class="adjust-radio-outer" id="radio-spotlight">
+            <div class="adjust-radio-inner" id="radio-inner-spotlight" style="display: none;"></div>
+          </div>
+          <span class="adjust-layout-label" id="label-spotlight">Spotlight</span>
+          <div class="adjust-preview-box">
+            <svg width="52" height="36" viewBox="0 0 52 36" fill="none">
+              <rect x="1" y="1" width="50" height="34" rx="2" fill="#ccc"/>
+            </svg>
+          </div>
+        </label>
+
+        <!-- Sidebar -->
+        <label class="adjust-layout-row" onclick="selectLayoutPreset('sidebar')">
+          <div class="adjust-radio-outer" id="radio-sidebar">
+            <div class="adjust-radio-inner" id="radio-inner-sidebar" style="display: none;"></div>
+          </div>
+          <span class="adjust-layout-label" id="label-sidebar">Sidebar</span>
+          <div class="adjust-preview-box">
+            <svg width="52" height="36" viewBox="0 0 52 36" fill="none">
+              <rect x="1" y="1" width="36" height="34" rx="2" fill="#ccc"/>
+              <rect x="40" y="1" width="11" height="10" rx="1.5" fill="#ddd"/>
+              <rect x="40" y="14" width="11" height="10" rx="1.5" fill="#ddd"/>
+              <rect x="40" y="26" width="11" height="9" rx="1.5" fill="#ddd"/>
+            </svg>
+          </div>
+        </label>
+      </div>
+
+      <div class="adjust-divider"></div>
+
+      <div class="adjust-tiles-section">
+        <div class="adjust-tiles-title">Tiles</div>
+        <div class="adjust-tiles-subtitle" id="tilesSizeSubtitle">Drag to change tile size</div>
+        <div class="adjust-slider-row">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="5" rx="1" fill="#aaa"/><rect x="11" y="4" width="7" height="5" rx="1" fill="#aaa"/><rect x="2" y="11" width="7" height="5" rx="1" fill="#aaa"/><rect x="11" y="11" width="7" height="5" rx="1" fill="#aaa"/></svg>
+          <input type="range" class="adjust-slider" id="tileSizeSlider" min="1" max="5" value="3">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="5" height="5" rx="0.8" fill="#aaa"/><rect x="8" y="2" width="5" height="5" rx="0.8" fill="#aaa"/><rect x="14" y="2" width="5" height="5" rx="0.8" fill="#aaa"/><rect x="2" y="8" width="5" height="5" rx="0.8" fill="#aaa"/><rect x="8" y="8" width="5" height="5" rx="0.8" fill="#aaa"/><rect x="14" y="8" width="5" height="5" rx="0.8" fill="#aaa"/><rect x="2" y="14" width="5" height="5" rx="0.8" fill="#aaa"/><rect x="8" y="14" width="5" height="5" rx="0.8" fill="#aaa"/><rect x="14" y="14" width="5" height="5" rx="0.8" fill="#aaa"/></svg>
+        </div>
+      </div>
+
+      <div class="adjust-divider"></div>
+
+      <div class="adjust-toggle-row">
+        <span class="adjust-toggle-label">Hide tiles without video</span>
+        <div class="adjust-toggle-switch" id="hideVideoToggle" onclick="toggleHideTilesWithoutVideo()">
+          <div class="adjust-toggle-knob" id="hideVideoKnob"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agora SDK -->
+  <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.22.0.js"></script>
+  
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // ── Issue #1 FIX: Remove port-check — use hostname only to detect local dev ──
+    const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000'
+      : 'https://mpulse-digi-ai-backend.onrender.com';
+    
+    // Parse URL parameters (inward mapping supports both channel and channelName)
+    const params = new URLSearchParams(window.location.search);
+    const channelName = params.get('channel') || params.get('channelName') || 'mpulse-live';
+    const role = params.get('role') || 'subscriber'; // 'publisher' (teacher) or 'subscriber' (student)
+    
+    document.getElementById('classTitle').textContent = `Classroom: ${channelName.toUpperCase()}`;
+
+    // ── Issue #6 FIX: Sanitize displayName from URL parameter to prevent XSS ──
+    function sanitizeText(str) {
+      return String(str || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').trim();
+    }
+
+    // App State Variables
+    let client = null;
+    let localTracks = { videoTrack: null, audioTrack: null };
+    let lobbyTracks = { videoTrack: null, audioTrack: null };
+    let remoteUsers = {};
+    
+    // User name state — sanitize URL param immediately
+    let displayName = sanitizeText(params.get('name') || '');
+    let myUid = Math.floor(100000 + Math.random() * 900000);
+    
+    // Lobby Preview States
+    let lobbyMicActive = true;
+    let lobbyCamActive = true;
+    
+    // Classroom States
+    let isMuted = false;
+    let isCamOff = false;
+    let isScreenSharing = false;
+    let screenTrack = null;
+    let handRaised = false;
+    
+    // Roster / Participant name cache (UID => Name)
+    let participantNameMap = {};
+
+    // Recording variables
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    // Switch Panel (Chat vs Roster)
+    let sidePanelOpen = false;
+    let currentPanelTab = '';
+
+    // Adjust view states
+    let currentLayoutPreset = 'auto'; // 'auto', 'tiled', 'spotlight', 'sidebar'
+    let hideTilesWithoutVideo = true;
+
+    function toggleSidePanel(tab) {
+      if (role !== 'publisher' && tab === 'roster') {
+        // Students should not view the participants list
+        return;
+      }
+      
+      const panel = document.querySelector('.side-panel');
+      const chatToggle = document.getElementById('chatToggleBtn');
+      const rosterToggle = document.getElementById('rosterToggleBtn');
+      
+      if (!sidePanelOpen) {
+        panel.style.display = 'flex';
+        sidePanelOpen = true;
+        switchPanel(tab);
+      } else if (currentPanelTab === tab) {
+        panel.style.display = 'none';
+        sidePanelOpen = false;
+        currentPanelTab = '';
+      } else {
+        switchPanel(tab);
+      }
+      
+      chatToggle.classList.toggle('active', sidePanelOpen && currentPanelTab === 'chat');
+      if (role === 'publisher') {
+        rosterToggle.classList.toggle('active', sidePanelOpen && currentPanelTab === 'roster');
+      }
+    }
+
+    function switchPanel(panel) {
+      if (role !== 'publisher' && (panel === 'roster' || panel === 'summary')) return;
+      
+      currentPanelTab = panel;
+      document.getElementById('tabChat').classList.toggle('active', panel === 'chat');
+      document.getElementById('tabRoster').classList.toggle('active', panel === 'roster');
+      document.getElementById('tabSummary').classList.toggle('active', panel === 'summary');
+      
+      document.getElementById('panelChatContent').style.display = panel === 'chat' ? 'flex' : 'none';
+      document.getElementById('panelRosterContent').style.display = panel === 'roster' ? 'flex' : 'none';
+      document.getElementById('panelSummaryContent').style.display = panel === 'summary' ? 'flex' : 'none';
+      
+      document.getElementById('chatToggleBtn').classList.toggle('active', sidePanelOpen && currentPanelTab === 'chat');
+      if (role === 'publisher') {
+        document.getElementById('rosterToggleBtn').classList.toggle('active', sidePanelOpen && currentPanelTab === 'roster');
+      }
+    }
+
+    // Set up Lobby screen
+    async function initLobby() {
+      const localUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      
+      if (role !== 'publisher') {
+        if (localUser.name) {
+          displayName = localUser.name;
+          document.getElementById('lobbyNameInput').value = displayName;
+          document.getElementById('lobbyNameInput').disabled = true;
+          document.getElementById('lobbyNameInput').style.opacity = '0.7';
+        }
+        
+        // Hide participants button & roster panel for students
+        document.getElementById('rosterToggleBtn').style.display = 'none';
+        document.getElementById('tabRoster').style.display = 'none';
+        document.getElementById('menuRosterBtn').style.display = 'none';
+        
+        // Hide recording button for students
+        document.getElementById('recordMenuBtn').style.display = 'none';
+      } else {
+        if (displayName) {
+          document.getElementById('lobbyNameInput').value = displayName;
+        } else if (localUser.name) {
+          displayName = localUser.name;
+          document.getElementById('lobbyNameInput').value = displayName;
+        }
+        document.getElementById('tabSummary').style.display = 'block';
+      }
+
+      if (typeof AgoraRTC === 'undefined') {
+        alert('Agora SDK failed to load. Check your internet connection.');
+        return;
+      }
+
+      // 1. Microphone Initialization
+      try {
+        lobbyTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+        lobbyMicActive = true;
+      } catch (err) {
+        console.warn('Lobby microphone preview error:', err);
+        lobbyMicActive = false;
+        document.getElementById('lobbyMicBtn').classList.add('disabled');
+        document.getElementById('lobbyMicBtn').textContent = '🚫';
+        document.getElementById('lobbyMicBtn').title = `Microphone unavailable: ${err.message}`;
+      }
+
+      // 2. Camera Initialization
+      try {
+        lobbyTracks.videoTrack = await AgoraRTC.createCameraVideoTrack({ encoderConfig: '720p_1' });
+        lobbyCamActive = true;
+        document.getElementById('lobbyPreviewAvatar').style.display = 'none';
+        lobbyTracks.videoTrack.play('lobbyPreviewPlayer');
+      } catch (err) {
+        console.warn('Lobby camera preview error:', err);
+        document.getElementById('lobbyPreviewAvatar').style.display = 'flex';
+        lobbyCamActive = false;
+        document.getElementById('lobbyCamBtn').classList.add('disabled');
+        document.getElementById('lobbyCamBtn').textContent = '🚫';
+        document.getElementById('lobbyCamBtn').title = `Camera unavailable: ${err.message}`;
+      }
+    }
+
+    // Toggle Preview Microphone
+    async function toggleLobbyMic() {
+      if (!lobbyTracks.audioTrack) return;
+      if (lobbyMicActive) {
+        await lobbyTracks.audioTrack.setEnabled(false);
+        lobbyMicActive = false;
+        document.getElementById('lobbyMicBtn').classList.add('disabled');
+        document.getElementById('lobbyMicBtn').textContent = '🔇';
+      } else {
+        await lobbyTracks.audioTrack.setEnabled(true);
+        lobbyMicActive = true;
+        document.getElementById('lobbyMicBtn').classList.remove('disabled');
+        document.getElementById('lobbyMicBtn').textContent = '🎙️';
+      }
+    }
+
+    // Toggle Preview Camera
+    async function toggleLobbyCam() {
+      if (!lobbyTracks.videoTrack) return;
+      if (lobbyCamActive) {
+        await lobbyTracks.videoTrack.setEnabled(false);
+        lobbyCamActive = false;
+        document.getElementById('lobbyCamBtn').classList.add('disabled');
+        document.getElementById('lobbyCamBtn').textContent = '🚫';
+        document.getElementById('lobbyPreviewAvatar').style.display = 'flex';
+      } else {
+        await lobbyTracks.videoTrack.setEnabled(true);
+        lobbyCamActive = true;
+        document.getElementById('lobbyCamBtn').classList.remove('disabled');
+        document.getElementById('lobbyCamBtn').textContent = '📷';
+        document.getElementById('lobbyPreviewAvatar').style.display = 'none';
+      }
+    }
+
+    let waitingRoomInterval = null;
+    let waitingRoomTimeout = null; // ── Issue #5 FIX: timeout reference
+
+    // Join Trigger
+    async function requestToJoinClassroom() {
+      const nameVal = document.getElementById('lobbyNameInput').value.trim();
+      if (!nameVal) {
+        alert('Please enter your display name to join.');
+        return;
+      }
+      // ── Issue #6 FIX: sanitize display name entered in lobby form ──
+      displayName = sanitizeText(nameVal);
+
+      if (lobbyTracks.videoTrack) {
+        lobbyTracks.videoTrack.stop();
+        lobbyTracks.videoTrack.close();
+      }
+      if (lobbyTracks.audioTrack) {
+        lobbyTracks.audioTrack.stop();
+        lobbyTracks.audioTrack.close();
+      }
+
+      if (role === 'publisher') {
+        document.getElementById('lobbyScreen').style.display = 'none';
+        document.getElementById('classroomContainer').style.display = 'flex';
+        await initClassroom();
+      } else {
+        document.getElementById('lobbyScreen').style.display = 'none';
+        document.getElementById('waitingRoomScreen').style.display = 'flex';
+
+        // 1. Initial register on waitlist
+        try {
+          await fetch(`${BACKEND_URL}/api/classroom/register-name`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              channelName, 
+              uid: myUid, 
+              name: displayName, 
+              role, 
+              handRaised: false,
+              micAllowed: false,
+              videoAllowed: false,
+              approved: false
+            })
+          });
+        } catch (err) {
+          console.warn('Failed initial register waitlist student:', err);
+        }
+
+        // 2. Poll for Host Approval
+        waitingRoomInterval = setInterval(async () => {
+          try {
+            const res = await fetch(`${BACKEND_URL}/api/classroom/names?channelName=${channelName}`);
+            const data = await res.json();
+            
+            if (data.mappings) {
+              const myMapping = data.mappings.find(m => m.uid === myUid);
+              if (myMapping && myMapping.approved === true) {
+                clearInterval(waitingRoomInterval);
+                clearTimeout(waitingRoomTimeout);
+                document.getElementById('waitingRoomScreen').style.display = 'none';
+                document.getElementById('classroomContainer').style.display = 'flex';
+                await initClassroom();
+              }
+            }
+          } catch (err) {
+            console.warn('Waiting room poll error:', err);
+          }
+        }, 3000);
+
+        // ── Issue #5 FIX: Timeout after 15 minutes if host never admits student ──
+        waitingRoomTimeout = setTimeout(() => {
+          if (waitingRoomInterval) {
+            clearInterval(waitingRoomInterval);
+            waitingRoomInterval = null;
+          }
+          const waitMsg = document.getElementById('waitingRoomMsg');
+          if (waitMsg) {
+            waitMsg.innerHTML = '⏰ <strong>Host has not admitted you yet.</strong><br>Please contact your teacher or try rejoining the class later.';
+            waitMsg.style.color = '#ef4444';
+          }
+          const waitSpinner = document.getElementById('waitingSpinner');
+          if (waitSpinner) waitSpinner.style.display = 'none';
+          console.warn('[WaitingRoom] Timed out after 15 minutes — host did not admit student.');
+        }, 15 * 60 * 1000); // 15 minutes
+      }
+    }
+
+    // ── Issue #3 FIX: Real-time synced chat via DB polling ──
+    // Chat messages are persisted in MongoDB and polled every 2.5 seconds.
+    // This replaces the old in-memory local-only chat array.
+    let chatLastTimestamp = null;  // ISO string of last received message
+    let chatPollInterval = null;
+
+    const messages = [
+      { sender: 'System', text: 'Welcome to your interactive live classroom! Chat messages are now synced for everyone in real-time.', system: true }
+    ];
+
+    function renderMessages() {
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = '';
+      messages.forEach(m => {
+        // Filter out teacher chat messages from student UI
+        if (role !== 'publisher' && m.teacher) {
+          return;
+        }
+        
+        const item = document.createElement('div');
+        item.className = 'message-item';
+        
+        let senderClass = '';
+        if (m.teacher) senderClass = 'teacher';
+        
+        item.innerHTML = `
+          <span class="msg-sender ${senderClass}">${m.sender}</span>
+          <div class="msg-text">${m.text}</div>
+        `;
+        container.appendChild(item);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Send chat message — persist to DB for real-time sync
+    async function sendMsg() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      // Optimistic local display
+      const localMsg = { sender: displayName, text: sanitizeText(text), teacher: role === 'publisher', local: true };
+      messages.push(localMsg);
+      renderMessages();
+
+      try {
+        await fetch(`${BACKEND_URL}/api/classroom/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            channelName,
+            sender: displayName,
+            text,
+            isTeacher: role === 'publisher'
+          })
+        });
+      } catch (err) {
+        console.warn('Chat send error:', err);
+      }
+    }
+
+    // Poll DB for new chat messages from other participants
+    async function pollChatMessages() {
+      try {
+        let url = `${BACKEND_URL}/api/classroom/chat?channelName=${encodeURIComponent(channelName)}`;
+        if (chatLastTimestamp) {
+          url += `&since=${encodeURIComponent(chatLastTimestamp)}`;
+        }
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.messages && data.messages.length > 0) {
+          let changed = false;
+          data.messages.forEach(m => {
+            // Avoid duplicating our own optimistic messages
+            const isDuplicate = messages.some(
+              existing => !existing.system && existing.sender === m.sender &&
+              existing.text === m.text && existing._id === m._id
+            );
+            if (!isDuplicate) {
+              // Remove matching optimistic local message if exists
+              const localIdx = messages.findIndex(
+                lm => lm.local && lm.sender === m.sender && lm.text === sanitizeText(m.text)
+              );
+              if (localIdx !== -1) {
+                messages.splice(localIdx, 1);
+              }
+              messages.push({
+                _id: m._id,
+                sender: sanitizeText(m.sender),
+                text: sanitizeText(m.text),
+                teacher: m.isTeacher
+              });
+              changed = true;
+            }
+            // Track latest timestamp
+            if (!chatLastTimestamp || new Date(m.createdAt) > new Date(chatLastTimestamp)) {
+              chatLastTimestamp = m.createdAt;
+            }
+          });
+          if (changed) renderMessages();
+        }
+      } catch (err) {
+        console.warn('Chat poll error:', err);
+      }
+    }
+
+    // Start chat polling after joining the classroom
+    function startChatPolling() {
+      if (chatPollInterval) return;
+      // Initial load of all existing messages
+      chatLastTimestamp = null;
+      pollChatMessages();
+      chatPollInterval = setInterval(pollChatMessages, 2500);
+    }
+
+    // Full Screen Toggle API
+    function toggleFullscreen() {
+      const fsBtn = document.getElementById('fullscreenBtn');
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) { /* Android WebView fallback */
+          elem.webkitRequestFullscreen();
+        }
+        fsBtn.classList.add('active');
+        fsBtn.title = "Exit Fullscreen";
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+        fsBtn.classList.remove('active');
+        fsBtn.title = "Fullscreen";
+      }
+    }
+
+    // Mobile specific menu toggles to prevent button cutoff
+    function toggleSidePanelFromMenu(tab) {
+      toggleMoreMenu();
+      toggleSidePanel(tab);
+    }
+
+    function toggleScreenShareFromMenu() {
+      toggleMoreMenu();
+      toggleScreenShare();
+    }
+
+    function toggleRaiseHandFromMenu() {
+      toggleMoreMenu();
+      toggleRaiseHand();
+    }
+
+    function toggleFullscreenFromMenu() {
+      toggleMoreMenu();
+      toggleFullscreen();
+    }
+
+    // Helper to determine which div container to append user video card to (Google Meet presentation style)
+    function getTargetContainer(uid, isMe) {
+      const isTeacher = (isMe && role === 'publisher') || (!isMe && participantNameMap[uid]?.role === 'publisher');
+      if (isTeacher) {
+        return document.getElementById('main-presenter-area');
+      } else {
+        return document.getElementById('sidebar-videos-area');
+      }
+    }
+
+    // ── ADJUST VIEW LOGIC ──
+    function openAdjustViewModal() {
+      toggleMoreMenu(); // Close dropdown
+      const modal = document.getElementById('adjustViewModal');
+      modal.style.display = 'flex';
+      updateAdjustModalUI();
+    }
+
+    function closeAdjustViewModal() {
+      document.getElementById('adjustViewModal').style.display = 'none';
+    }
+
+    function updateAdjustModalUI() {
+      const presets = ['auto', 'tiled', 'spotlight', 'sidebar'];
+      presets.forEach(p => {
+        document.getElementById(`radio-${p}`).classList.remove('selected');
+        document.getElementById(`radio-inner-${p}`).style.display = 'none';
+        document.getElementById(`label-${p}`).classList.remove('selected');
+      });
+      
+      document.getElementById(`radio-${currentLayoutPreset}`).classList.add('selected');
+      document.getElementById(`radio-inner-${currentLayoutPreset}`).style.display = 'block';
+      document.getElementById(`label-${currentLayoutPreset}`).classList.add('selected');
+      
+      const slider = document.getElementById('tileSizeSlider');
+      const subtitle = document.getElementById('tilesSizeSubtitle');
+      if (currentLayoutPreset === 'sidebar') {
+        slider.disabled = true;
+        subtitle.textContent = "Can't change tile size in this layout";
+      } else {
+        slider.disabled = false;
+        subtitle.textContent = "Drag to change tile size";
+      }
+      
+      const toggle = document.getElementById('hideVideoToggle');
+      if (hideTilesWithoutVideo) {
+        toggle.classList.add('active');
+      } else {
+        toggle.classList.remove('active');
+      }
+    }
+
+    function selectLayoutPreset(preset) {
+      currentLayoutPreset = preset;
+      updateAdjustModalUI();
+      applyLayoutPreset(preset);
+    }
+
+    function toggleHideTilesWithoutVideo() {
+      hideTilesWithoutVideo = !hideTilesWithoutVideo;
+      updateAdjustModalUI();
+      applyTileVisibilityFilter();
+    }
+
+    function applyTileVisibilityFilter() {
+      const cards = Array.from(document.querySelectorAll('.video-card'));
+      cards.forEach(card => {
+        const uidStr = card.id.replace('video-card-', '');
+        const uid = parseInt(uidStr, 10);
+        
+        const avatar = document.getElementById(`avatar-${uid}`);
+        const isCamOffForUser = avatar && avatar.style.display !== 'none';
+        
+        const pInfo = participantNameMap[uid] || { uid, role: (uid === myUid ? role : 'student') };
+        const isTeacher = pInfo.role === 'publisher';
+        
+        if (hideTilesWithoutVideo && isCamOffForUser && !isTeacher && uid !== myUid) {
+          card.style.display = 'none';
+        } else {
+          card.style.display = 'block';
+        }
+      });
+      adjustGridColumns();
+    }
+
+    function applyLayoutPreset(preset) {
+      // 1. Check if there is an active spotlight
+      let spotlightUid = null;
+      for (let uid in participantNameMap) {
+        if (participantNameMap[uid].spotlight === true) {
+          spotlightUid = parseInt(uid, 10);
+          break;
+        }
+      }
+
+      const videoZone = document.querySelector('.video-zone');
+      const mainArea = document.getElementById('main-presenter-area');
+      const sidebarArea = document.getElementById('sidebar-videos-area');
+      
+      videoZone.className = 'video-zone';
+      const cards = Array.from(document.querySelectorAll('.video-card'));
+      
+      if (spotlightUid) {
+        videoZone.classList.add('layout-sidebar');
+        sidebarArea.style.display = 'flex';
+        
+        cards.forEach(card => {
+          const uidStr = card.id.replace('video-card-', '');
+          const uid = parseInt(uidStr, 10);
+          if (uid === spotlightUid) {
+            mainArea.appendChild(card);
+          } else {
+            sidebarArea.appendChild(card);
+          }
+        });
+      } else {
+        cards.forEach(card => {
+          const uidStr = card.id.replace('video-card-', '');
+          const uid = parseInt(uidStr, 10);
+          const pInfo = participantNameMap[uid] || { uid, role: (uid === myUid ? role : 'student') };
+          const isTeacher = pInfo.role === 'publisher';
+          
+          if (preset === 'sidebar') {
+            if (isTeacher) {
+              mainArea.appendChild(card);
+            } else {
+              sidebarArea.appendChild(card);
+            }
+          } else if (preset === 'spotlight') {
+            if (isTeacher) {
+              mainArea.appendChild(card);
+            } else {
+              sidebarArea.appendChild(card);
+            }
+          } else {
+            mainArea.appendChild(card);
+          }
+        });
+        
+        if (preset === 'sidebar') {
+          videoZone.classList.add('layout-sidebar');
+          sidebarArea.style.display = 'flex';
+        } else if (preset === 'spotlight') {
+          videoZone.classList.add('layout-spotlight');
+          sidebarArea.style.display = 'none';
+        } else if (preset === 'tiled') {
+          videoZone.classList.add('layout-tiled');
+          sidebarArea.style.display = 'none';
+        } else {
+          videoZone.classList.add('layout-auto');
+          sidebarArea.style.display = 'none';
+        }
+      }
+      
+      adjustGridColumns();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // AGORA RTC MULTI-USER GRID INTEGRATION
+    // ─────────────────────────────────────────────────────────────
+
+    // ── Issue #2 FIX: Token renewal helper ──
+    async function renewAgoraToken() {
+      try {
+        console.log('[Agora] Token privilege expiring — fetching new token...');
+        const tokenRes = await fetch(`${BACKEND_URL}/api/agora-token?channelName=${channelName}&role=${role}&uid=${myUid}`);
+        const tokenData = await tokenRes.json();
+        if (tokenData.token && client) {
+          await client.renewToken(tokenData.token);
+          console.log('[Agora] Token renewed successfully.');
+        }
+      } catch (err) {
+        console.error('[Agora] Token renewal failed:', err);
+      }
+    }
+
+    async function initClassroom() {
+      renderMessages();
+
+      try {
+        const tokenRes = await fetch(`${BACKEND_URL}/api/agora-token?channelName=${channelName}&role=${role}&uid=${myUid}`);
+        const tokenData = await tokenRes.json();
+        
+        if (tokenData.error) throw new Error(tokenData.error);
+        const { token, appId } = tokenData;
+
+        // ── DUAL ENGINE: "live" mode required for host/audience role switching ──
+        // mode:'live' + codec:'vp8' enables setClientRole() which powers:
+        //   - Lecture Mode  → teacher = host, students = audience (passive viewers)
+        //   - Interactive Mode → teacher = host, approved students promoted to host
+        client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
+
+        // ── Issue #2 FIX: Register token-renewal events ──
+        client.on('token-privilege-will-expire', renewAgoraToken);
+        client.on('token-privilege-did-expire', async () => {
+          console.warn('[Agora] Token has expired — attempting emergency renewal...');
+          await renewAgoraToken();
+        });
+
+        // Set Agora client role BEFORE joining the channel
+        const isHost = (role === 'publisher');
+        if (isHost) {
+          // Teacher / co-host: can publish audio + video streams
+          await client.setClientRole('host');
+          console.log('[Agora] Client role set to HOST (publisher)');
+        } else {
+          // Students join as audience with ultra-low latency (level 1)
+          // They are passive viewers until the host grants them permission to speak
+          await client.setClientRole('audience', { level: 1 });
+          console.log('[Agora] Client role set to AUDIENCE (subscriber/student)');
+        }
+
+        await fetch(`${BACKEND_URL}/api/classroom/register-name`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            channelName, 
+            uid: myUid, 
+            name: displayName, 
+            role, 
+            handRaised: false,
+            micAllowed: isHost,
+            videoAllowed: isHost,
+            approved: true
+          })
+        });
+        
+        participantNameMap[myUid] = { name: displayName, role, handRaised: false, micAllowed: isHost, videoAllowed: isHost, approved: true };
+
+        pollRosterNames();
+        setInterval(pollRosterNames, 5000);
+
+        sendHeartbeat();
+        setInterval(sendHeartbeat, 10000);
+
+        // ── Issue #3 FIX: Start real-time chat polling ──
+        startChatPolling();
+
+        await client.join(appId, channelName, token, myUid);
+        console.log('Joined Agora RTC Room successfully! UID:', myUid, '| Role:', isHost ? 'HOST' : 'AUDIENCE');
+
+        client.on('user-published', handleUserPublished);
+        client.on('user-unpublished', handleUserUnpublished);
+
+        // ── TRACK CREATION: Only hosts publish streams by default ──
+        // Students (audience) do NOT create or publish tracks unless:
+        //   a) They are in Interactive Mode AND
+        //   b) The host promotes them to 'host' role via allowStudentToSpeak()
+        if (isHost) {
+          let audioTrackError = null;
+          let videoTrackError = null;
+
+          // 1. Microphone Initialization
+          try {
+            localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+          } catch (err) {
+            console.error('[Agora] Failed to create microphone track:', err);
+            audioTrackError = err;
+          }
+
+          // 2. Camera Initialization
+          try {
+            localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack({ encoderConfig: '720p_1' });
+          } catch (err) {
+            console.error('[Agora] Failed to create camera track:', err);
+            videoTrackError = err;
+          }
+
+          // 3. Create Video Card
+          createVideoCard(myUid, displayName, true);
+
+          // 4. Configure microphone states
+          const micBtn = document.getElementById('micBtn');
+          if (localTracks.audioTrack) {
+            if (!lobbyMicActive) {
+              await localTracks.audioTrack.setEnabled(false);
+              isMuted = true;
+              micBtn.classList.add('disabled');
+              micBtn.textContent = '🔇';
+              document.getElementById(`muted-${myUid}`).style.display = 'flex';
+            }
+          } else {
+            isMuted = true;
+            micBtn.classList.add('disabled');
+            micBtn.textContent = '🔒';
+            micBtn.disabled = true;
+            micBtn.title = `Microphone unavailable: ${audioTrackError ? audioTrackError.message : 'Unknown error'}`;
+            document.getElementById(`muted-${myUid}`).style.display = 'flex';
+          }
+
+          // 5. Configure camera states
+          const camBtn = document.getElementById('camBtn');
+          if (localTracks.videoTrack) {
+            localTracks.videoTrack.play(`video-player-${myUid}`);
+            if (!lobbyCamActive) {
+              await localTracks.videoTrack.setEnabled(false);
+              isCamOff = true;
+              camBtn.classList.add('disabled');
+              camBtn.textContent = '🚫';
+              document.getElementById(`avatar-${myUid}`).style.display = 'flex';
+            }
+          } else {
+            isCamOff = true;
+            camBtn.classList.add('disabled');
+            camBtn.textContent = '🔒';
+            camBtn.disabled = true;
+            camBtn.title = `Camera unavailable: ${videoTrackError ? videoTrackError.message : 'Unknown error'}`;
+            document.getElementById(`avatar-${myUid}`).style.display = 'flex';
+          }
+
+          // 6. Publish available tracks
+          const tracksToPublish = [];
+          if (localTracks.audioTrack) tracksToPublish.push(localTracks.audioTrack);
+          if (localTracks.videoTrack) tracksToPublish.push(localTracks.videoTrack);
+
+          if (tracksToPublish.length > 0) {
+            await client.publish(tracksToPublish);
+            console.log(`[Agora] Host tracks published successfully! (${tracksToPublish.length} tracks)`);
+          } else {
+            console.warn('[Agora] No host tracks available to publish.');
+          }
+
+          // 7. Warn user if microphone or camera failed to open
+          if (audioTrackError || videoTrackError) {
+            let warnMsg = 'Agora connected, but some devices could not be started:\n';
+            if (audioTrackError) warnMsg += `• Microphone: ${audioTrackError.name} (${audioTrackError.message})\n`;
+            if (videoTrackError) warnMsg += `• Camera: ${videoTrackError.name} (${videoTrackError.message})\n`;
+            warnMsg += '\nYou can still participate in the classroom, but you may need to check your permissions or verify if another app is using your camera/microphone.';
+            alert(warnMsg);
+          }
+        } else {
+          // Student joins as silent audience — show avatar tile with their name
+          createVideoCard(myUid, displayName, true);
+          document.getElementById(`avatar-${myUid}`).style.display = 'flex';
+          // Disable publish buttons for pure audience members (greyed out)
+          document.getElementById('micBtn').classList.add('disabled');
+          document.getElementById('camBtn').classList.add('disabled');
+          document.getElementById('micBtn').title = 'Mic disabled — waiting for host permission';
+          document.getElementById('camBtn').title = 'Camera disabled — waiting for host permission';
+          console.log('[Agora] Student joined as AUDIENCE (silent viewer). Awaiting host permissions.');
+        }
+        
+        // Start Speech-To-Text Live Captioning
+        startSpeechToText();
+
+      } catch (err) {
+        console.error('Failed to initialize classroom:', err);
+        alert('Failed to connect to Agora classroom: ' + err.message);
+      }
+    }
+
+    function createVideoCard(uid, name, isMe = false) {
+      if (document.getElementById(`video-card-${uid}`)) return;
+
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.id = `video-card-${uid}`;
+
+      const initial = name ? name.charAt(0).toUpperCase() : '?';
+      const showNamesOverlay = true; // Always show names overlay so all users can see participant names
+
+      card.innerHTML = `
+        <div class="video-card-player" id="video-player-${uid}"></div>
+        <div class="video-card-avatar" id="avatar-${uid}" style="display: none;">
+          <div class="video-card-avatar-inner">${initial}</div>
+        </div>
+        <div class="video-card-muted-icon" id="muted-${uid}" style="display: none;">🔇</div>
+        <div class="video-card-hand-raised" id="hand-raised-${uid}" style="display: none;">✋</div>
+        <div class="video-card-name" style="${showNamesOverlay ? '' : 'display:none;'}">
+          <span>${name} ${isMe ? '(You)' : ''}</span>
+        </div>
+      `;
+
+      const mainArea = document.getElementById('main-presenter-area');
+      const sidebarArea = document.getElementById('sidebar-videos-area');
+      const isTeacher = (isMe && role === 'publisher') || (!isMe && participantNameMap[uid]?.role === 'publisher');
+
+      if (currentLayoutPreset === 'sidebar') {
+        if (isTeacher) {
+          mainArea.appendChild(card);
+        } else {
+          sidebarArea.appendChild(card);
+        }
+      } else if (currentLayoutPreset === 'spotlight') {
+        if (isTeacher) {
+          mainArea.appendChild(card);
+        } else {
+          sidebarArea.appendChild(card);
+        }
+      } else {
+        mainArea.appendChild(card);
+      }
+      
+      adjustGridColumns();
+      applyTileVisibilityFilter();
+    }
+
+    function removeVideoCard(uid) {
+      const card = document.getElementById(`video-card-${uid}`);
+      if (card) {
+        card.remove();
+      }
+      adjustGridColumns();
+    }
+
+    function adjustGridColumns() {
+      const mainArea = document.getElementById('main-presenter-area');
+      const sidebar = document.getElementById('sidebar-videos-area');
+      const videoZone = document.querySelector('.video-zone');
+      
+      if (currentLayoutPreset === 'sidebar') {
+        const visibleStudents = Array.from(sidebar.children).filter(c => c.style.display !== 'none');
+        if (visibleStudents.length === 0) {
+          videoZone.classList.add('no-students');
+        } else {
+          videoZone.classList.remove('no-students');
+        }
+      }
+      
+      if (currentLayoutPreset === 'auto' || currentLayoutPreset === 'tiled') {
+        const visibleCards = Array.from(mainArea.children).filter(c => c.style.display !== 'none');
+        const cardsCount = visibleCards.length;
+        if (cardsCount === 0) return;
+        
+        let cols = 1;
+        if (currentLayoutPreset === 'tiled') {
+          cols = Math.ceil(Math.sqrt(cardsCount));
+        } else {
+          if (cardsCount >= 2 && cardsCount <= 4) cols = 2;
+          else if (cardsCount > 4) cols = 3;
+        }
+        
+        mainArea.style.display = 'grid';
+        mainArea.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        mainArea.style.gap = '16px';
+      } else {
+        mainArea.style.display = 'flex';
+        mainArea.style.gridTemplateColumns = 'none';
+        mainArea.style.gap = '0';
+      }
+    }
+
+    async function handleUserPublished(user, mediaType) {
+      const uid = user.uid;
+      await client.subscribe(user, mediaType);
+      
+      const pInfo = participantNameMap[uid] || { name: `User ${uid}`, role: 'student', handRaised: false };
+
+      if (mediaType === 'video') {
+        createVideoCard(uid, pInfo.name);
+        document.getElementById(`avatar-${uid}`).style.display = 'none';
+        user.videoTrack.play(`video-player-${uid}`);
+        applyTileVisibilityFilter();
+      }
+
+      if (mediaType === 'audio') {
+        user.audioTrack.play();
+        createVideoCard(uid, pInfo.name);
+        document.getElementById(`muted-${uid}`).style.display = 'none';
+      }
+    }
+
+    function handleUserUnpublished(user, mediaType) {
+      const uid = user.uid;
+      if (mediaType === 'video') {
+        const avatar = document.getElementById(`avatar-${uid}`);
+        if (avatar) avatar.style.display = 'flex';
+        applyTileVisibilityFilter();
+      }
+      if (mediaType === 'audio') {
+        const muteIcon = document.getElementById(`muted-${uid}`);
+        if (muteIcon) muteIcon.style.display = 'flex';
+      }
+    }
+
+    async function toggleMic() {
+      if (!localTracks.audioTrack) return;
+      const mutedIcon = document.getElementById(`muted-${myUid}`);
+      
+      if (!isMuted) {
+        await localTracks.audioTrack.setEnabled(false);
+        isMuted = true;
+        document.getElementById('micBtn').classList.add('disabled');
+        document.getElementById('micBtn').textContent = '🔇';
+        if (mutedIcon) mutedIcon.style.display = 'flex';
+        if (recognition) {
+          try { recognition.stop(); } catch(e) {}
+        }
+      } else {
+        await localTracks.audioTrack.setEnabled(true);
+        isMuted = false;
+        document.getElementById('micBtn').classList.remove('disabled');
+        document.getElementById('micBtn').textContent = '🎙️';
+        if (mutedIcon) mutedIcon.style.display = 'none';
+        if (recognition) {
+          try { recognition.start(); } catch(e) {}
+        } else {
+          startSpeechToText();
+        }
+      }
+    }
+
+    async function toggleCam() {
+      if (!localTracks.videoTrack) return;
+      const avatar = document.getElementById(`avatar-${myUid}`);
+      
+      if (!isCamOff) {
+        await localTracks.videoTrack.setEnabled(false);
+        isCamOff = true;
+        document.getElementById('camBtn').classList.add('disabled');
+        document.getElementById('camBtn').textContent = '🚫';
+        if (avatar) avatar.style.display = 'flex';
+      } else {
+        await localTracks.videoTrack.setEnabled(true);
+        isCamOff = false;
+        document.getElementById('camBtn').classList.remove('disabled');
+        document.getElementById('camBtn').textContent = '📷';
+        if (avatar) avatar.style.display = 'none';
+      }
+      applyTileVisibilityFilter();
+    }
+
+    async function toggleScreenShare() {
+      if (!client) return;
+      const screenBtn = document.getElementById('screenBtn');
+      
+      try {
+        if (!isScreenSharing) {
+          console.log('Activating screen sharing...');
+          
+          screenTrack = await AgoraRTC.createScreenVideoTrack({ encoderConfig: "1080p_1" });
+          screenTrack.on("track-ended", () => {
+            stopScreenShare();
+          });
+
+          if (localTracks.videoTrack) {
+            await client.unpublish(localTracks.videoTrack);
+            localTracks.videoTrack.stop();
+          }
+          
+          await client.publish(screenTrack);
+          
+          document.getElementById(`avatar-${myUid}`).style.display = 'none';
+          screenTrack.play(`video-player-${myUid}`);
+          
+          isScreenSharing = true;
+          screenBtn.classList.add('active');
+          screenBtn.textContent = '⏹️';
+          screenBtn.title = 'Stop Screen Share';
+          
+          document.getElementById('camBtn').disabled = true;
+          document.getElementById('camBtn').style.opacity = 0.5;
+        } else {
+          await stopScreenShare();
+        }
+      } catch (err) {
+        console.error("Screen share error:", err);
+        alert("Failed to start screen share: " + err.message);
+      }
+    }
+
+    async function stopScreenShare() {
+      if (!isScreenSharing) return;
+      const screenBtn = document.getElementById('screenBtn');
+      
+      try {
+        if (screenTrack) {
+          await client.unpublish(screenTrack);
+          screenTrack.stop();
+          screenTrack.close();
+          screenTrack = null;
+        }
+        
+        if (!isCamOff) {
+          try {
+            localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack({ encoderConfig: '720p_1' });
+            document.getElementById(`avatar-${myUid}`).style.display = 'none';
+            localTracks.videoTrack.play(`video-player-${myUid}`);
+            await client.publish(localTracks.videoTrack);
+          } catch (camErr) {
+            console.error('[Agora] Failed to restore camera track after screen share:', camErr);
+            isCamOff = true;
+            document.getElementById(`avatar-${myUid}`).style.display = 'flex';
+            const camBtn = document.getElementById('camBtn');
+            if (camBtn) {
+              camBtn.classList.add('disabled');
+              camBtn.textContent = '🚫';
+              camBtn.title = `Camera unavailable: ${camErr.message}`;
+            }
+          }
+        } else {
+          document.getElementById(`avatar-${myUid}`).style.display = 'flex';
+        }
+        
+        isScreenSharing = false;
+        screenBtn.classList.remove('active');
+        screenBtn.textContent = '🖥️';
+        screenBtn.title = 'Share Screen';
+        
+        document.getElementById('camBtn').disabled = false;
+        document.getElementById('camBtn').style.opacity = 1;
+      } catch (err) {
+        console.error("Stop screen share error:", err);
+      }
+    }
+
+    // Google Meet Raise Hand Support
+    async function toggleRaiseHand() {
+      const handBtn = document.getElementById('handBtn');
+      handRaised = !handRaised;
+      
+      const handOverlay = document.getElementById(`hand-raised-${myUid}`);
+      if (handOverlay) {
+        handOverlay.style.display = handRaised ? 'flex' : 'none';
+      }
+      
+      handBtn.classList.toggle('active', handRaised);
+      
+      try {
+        await fetch(`${BACKEND_URL}/api/classroom/register-name`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelName, uid: myUid, name: displayName, role, handRaised })
+        });
+      } catch (err) {
+        console.warn('Could not register raised hand:', err);
+      }
+    }
+
+    // Three-dot Options Menu
+    function toggleMoreMenu() {
+      const menu = document.getElementById('moreMenu');
+      const isHidden = menu.style.display === 'none';
+      menu.style.display = isHidden ? 'flex' : 'none';
+    }
+
+    // Update Toolbar Buttons visibility during recording
+    function updateToolbarRecordingState(active) {
+      const displayStyle = active ? 'none' : 'flex';
+      
+      document.getElementById('handBtn').style.display = displayStyle;
+      document.getElementById('moreBtn').style.display = displayStyle;
+      document.getElementById('chatToggleBtn').style.display = displayStyle;
+      
+      if (role === 'publisher') {
+        document.getElementById('rosterToggleBtn').style.display = displayStyle;
+      } else {
+        document.getElementById('rosterToggleBtn').style.display = 'none';
+      }
+      
+      // Auto close side panel when recording starts
+      if (active) {
+        document.querySelector('.side-panel').style.display = 'none';
+        sidePanelOpen = false;
+      }
+    }
+
+    // Local screen recording trigger (Google Meet style)
+    async function triggerLocalRecord() {
+      toggleMoreMenu(); // Hide menu
+      const recordLabel = document.getElementById('recordMenuLabel');
+      
+      if (!isRecording) {
+        try {
+          console.log("Initializing local classroom recording...");
+          
+          // 1. Capture the meeting screen/tab video & audio (system audio)
+          const screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: { cursor: "always" },
+            audio: true 
+          });
+          
+          // 2. Capture local microphone audio
+          const micStream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+          });
+          
+          // 3. Mix screen audio and mic audio into one stream
+          const combinedStream = new MediaStream();
+          combinedStream.addTrack(screenStream.getVideoTracks()[0]);
+          
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const dest = audioContext.createMediaStreamDestination();
+          
+          const micSource = audioContext.createMediaStreamSource(micStream);
+          micSource.connect(dest);
+          
+          if (screenStream.getAudioTracks().length > 0) {
+            const screenAudioSource = audioContext.createMediaStreamSource(screenStream);
+            screenAudioSource.connect(dest);
+          }
+          
+          combinedStream.addTrack(dest.stream.getAudioTracks()[0]);
+          
+          window.recordingStreams = { screenStream, micStream, audioContext };
+          
+          recordedChunks = [];
+          mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+          
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data && event.data.size > 0) {
+              recordedChunks.push(event.data);
+            }
+          };
+          
+          mediaRecorder.onstop = () => {
+            screenStream.getTracks().forEach(t => t.stop());
+            micStream.getTracks().forEach(t => t.stop());
+            audioContext.close();
+            
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Class_Recording_${channelName}_${Date.now()}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Re-show buttons
+            isRecording = false;
+            recordLabel.textContent = '📹 Record Meeting';
+            updateToolbarRecordingState(false);
+            
+            alert("Recording saved to your Downloads folder! You can upload this recording file inside your Student Portal Admin dashboard.");
+          };
+          
+          mediaRecorder.start();
+          isRecording = true;
+          recordLabel.textContent = '⏹️ Stop Recording';
+          
+          // Hide controls during recording
+          updateToolbarRecordingState(true);
+          
+        } catch (err) {
+          console.error("Recording start error:", err);
+          alert("Failed to start recording. Please make sure to share your screen/tab to enable screen recording.");
+        }
+      } else {
+        mediaRecorder.stop();
+      }
+    }
+
+    // Whiteboard modal
+    let isDrawing = false;
+    let canvas, ctx;
+
+    function initWhiteboard() {
+      canvas = document.getElementById('whiteboardCanvas');
+      ctx = canvas.getContext('2d');
+      
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', stopDraw);
+      canvas.addEventListener('mouseout', stopDraw);
+      
+      canvas.addEventListener('touchstart', (e) => startDraw(e.touches[0]));
+      canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        draw(e.touches[0]);
+      });
+      canvas.addEventListener('touchend', stopDraw);
+    }
+
+    function startDraw(e) {
+      isDrawing = true;
+      ctx.beginPath();
+      const rect = canvas.getBoundingClientRect();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      ctx.strokeStyle = document.getElementById('whiteboardColor').value;
+      ctx.lineWidth = document.getElementById('whiteboardBrush').value;
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      ctx.stroke();
+    }
+
+    function stopDraw() {
+      isDrawing = false;
+    }
+
+    function clearWhiteboard() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function toggleWhiteboard() {
+      toggleMoreMenu(); // Close options menu
+      const modal = document.getElementById('whiteboardModal');
+      const isHidden = modal.style.display === 'none';
+      modal.style.display = isHidden ? 'flex' : 'none';
+      if (isHidden) {
+        setTimeout(initWhiteboard, 100);
+      }
+    }
+
+    async function leaveChannel() {
+      // Clean up all intervals and timers
+      if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
+      if (waitingRoomInterval) { clearInterval(waitingRoomInterval); waitingRoomInterval = null; }
+      if (waitingRoomTimeout) { clearTimeout(waitingRoomTimeout); waitingRoomTimeout = null; }
+
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+      }
+      if (screenTrack) {
+        screenTrack.stop();
+        screenTrack.close();
+      }
+      for (let trackName in localTracks) {
+        var track = localTracks[trackName];
+        if (track) {
+          track.stop();
+          track.close();
+          localTracks[trackName] = null;
+        }
+      }
+      if (client) {
+        await client.leave();
+      }
+      window.location.href = role === 'publisher' ? 'admin.html' : 'student.html';
+    }
+
+    // Roster participant name & raised-hand polling
+    async function pollRosterNames() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/classroom/names?channelName=${channelName}`);
+        const data = await res.json();
+        
+        if (!data.mappings) return;
+        
+        const rosterList = document.getElementById('rosterList');
+        if (rosterList) rosterList.innerHTML = '';
+        
+        let activeStudents = 0;
+        let waitingCount = 0;
+        let waitingHtml = '';
+        let activeHtml = '';
+
+        // ── FIX: use for...of instead of forEach so await works correctly inside async function ──
+        for (const m of data.mappings) {
+          participantNameMap[m.uid] = { name: m.name, role: m.role, handRaised: m.handRaised, micAllowed: m.micAllowed, videoAllowed: m.videoAllowed, approved: m.approved, kicked: m.kicked, spotlight: m.spotlight };
+          
+          // Student Kick detection
+          if (m.uid === myUid && m.kicked === true && role !== 'publisher') {
+            alert("You have been kicked out of this classroom by the host.");
+            leaveChannel();
+            return;
+          }
+
+          // Student local permissions enforcement (live mode: must setClientRole before publishing)
+          if (m.uid === myUid && role !== 'publisher' && m.approved === true) {
+            const micBtn = document.getElementById('micBtn');
+            const camBtn = document.getElementById('camBtn');
+            
+            const hadMicPermission = !!(localTracks.audioTrack);
+            const hadCamPermission = !!(localTracks.videoTrack);
+            
+            // ── MIC PERMISSION HANDLER ──
+            if (m.micAllowed === false) {
+              // Revoke mic: unpublish and demote if no other tracks
+              if (localTracks.audioTrack) {
+                try {
+                  await client.unpublish(localTracks.audioTrack);
+                  localTracks.audioTrack.stop();
+                  localTracks.audioTrack.close();
+                  localTracks.audioTrack = null;
+                } catch(e) { console.warn('Mic unpublish error:', e); }
+              }
+              isMuted = true;
+              micBtn.disabled = true;
+              micBtn.style.opacity = '0.5';
+              micBtn.title = 'Muted by Teacher';
+              micBtn.textContent = '🔒';
+            } else if (m.micAllowed === true && !localTracks.audioTrack) {
+              // Grant mic: promote to host, create track, publish
+              try {
+                await client.setClientRole('host');
+                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                await client.publish(localTracks.audioTrack);
+                isMuted = false;
+                micBtn.disabled = false;
+                micBtn.style.opacity = '1';
+                micBtn.title = 'Mute/Unmute Mic';
+                micBtn.textContent = '🎙️';
+                document.getElementById(`muted-${myUid}`).style.display = 'none';
+                console.log('[Agora] Student promoted to HOST — mic published.');
+              } catch(e) {
+                console.error('Failed to publish student mic:', e);
+              }
+            } else if (m.micAllowed === true && localTracks.audioTrack) {
+              // Keep mic controls live
+              micBtn.disabled = false;
+              micBtn.style.opacity = '1';
+              micBtn.title = 'Mute/Unmute Mic';
+              micBtn.textContent = isMuted ? '🔇' : '🎙️';
+            }
+            
+            // ── CAMERA PERMISSION HANDLER ──
+            if (m.videoAllowed === false) {
+              // Revoke camera: unpublish and revert to avatar
+              if (localTracks.videoTrack) {
+                try {
+                  await client.unpublish(localTracks.videoTrack);
+                  localTracks.videoTrack.stop();
+                  localTracks.videoTrack.close();
+                  localTracks.videoTrack = null;
+                } catch(e) { console.warn('Cam unpublish error:', e); }
+              }
+              // If no audio either, demote back to audience
+              if (!localTracks.audioTrack) {
+                try { await client.setClientRole('audience', { level: 1 }); } catch(e) {}
+                console.log('[Agora] Student demoted back to AUDIENCE (no active tracks).');
+              }
+              isCamOff = true;
+              document.getElementById(`avatar-${myUid}`).style.display = 'flex';
+              camBtn.disabled = true;
+              camBtn.style.opacity = '0.5';
+              camBtn.title = 'Video Blocked by Teacher';
+              camBtn.textContent = '🔒';
+            } else if (m.videoAllowed === true && !localTracks.videoTrack) {
+              // Grant camera: ensure host role, create track, publish
+              try {
+                await client.setClientRole('host');
+                localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack({ encoderConfig: '720p_1' });
+                await client.publish(localTracks.videoTrack);
+                localTracks.videoTrack.play(`video-player-${myUid}`);
+                isCamOff = false;
+                document.getElementById(`avatar-${myUid}`).style.display = 'none';
+                camBtn.disabled = false;
+                camBtn.style.opacity = '1';
+                camBtn.title = 'Toggle Camera';
+                camBtn.textContent = '📷';
+                console.log('[Agora] Student promoted to HOST — camera published.');
+              } catch(e) {
+                console.error('Failed to publish student camera:', e);
+              }
+            } else if (m.videoAllowed === true && localTracks.videoTrack) {
+              // Keep camera controls live
+              camBtn.disabled = false;
+              camBtn.style.opacity = '1';
+              camBtn.title = 'Toggle Camera';
+              camBtn.textContent = isCamOff ? '🚫' : '📷';
+            }
+          }
+
+          // Update display card labels for all users
+          const nameSpan = document.querySelector(`#video-card-${m.uid} .video-card-name span`);
+          if (nameSpan) {
+            nameSpan.textContent = `${m.name} ${m.uid === myUid ? '(You)' : ''}`;
+          }
+
+          // Move teacher card to main presenter area if it's currently in sidebar / spotlight
+          if (m.role === 'publisher' && (currentLayoutPreset === 'sidebar' || currentLayoutPreset === 'spotlight')) {
+            const card = document.getElementById(`video-card-${m.uid}`);
+            const mainArea = document.getElementById('main-presenter-area');
+            if (card && card.parentElement !== mainArea) {
+              mainArea.appendChild(card);
+              adjustGridColumns();
+            }
+          }
+
+          // Update hand raised overlay
+          const handOverlay = document.getElementById(`hand-raised-${m.uid}`);
+          if (handOverlay) {
+            handOverlay.style.display = m.handRaised ? 'flex' : 'none';
+          }
+
+          const isTeacher = m.role === 'publisher';
+          if (!isTeacher && m.approved === true) activeStudents++;
+
+          const roleClass = isTeacher ? 'teacher' : '';
+          const roleLabel = isTeacher ? 'Teacher' : 'Student';
+          const avatarLetter = m.name.charAt(0).toUpperCase();
+
+          // Render roster items (Roster only shown/accessible to Teacher)
+          if (role === 'publisher') {
+            if (m.approved === false) {
+              waitingCount++;
+              waitingHtml += `
+                <div class="roster-item" style="border:1px dashed var(--warning); margin-bottom:6px;">
+                  <div class="roster-left">
+                    <div class="avatar" style="background:var(--warning);">${avatarLetter}</div>
+                    <span class="roster-name">${m.name}</span>
+                  </div>
+                  <button onclick="approveStudent(${m.uid})" style="background:var(--success); color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; font-weight:700;">Approve</button>
+                </div>
+              `;
+            } else {
+              const micIcon = m.micAllowed ? '🎙️' : '🔇';
+              const micClass = m.micAllowed ? 'allowed' : 'blocked';
+              const videoIcon = m.videoAllowed ? '📷' : '🚫';
+              const videoClass = m.videoAllowed ? 'allowed' : 'blocked';
+              const spotlightClass = m.spotlight ? 'allowed' : '';
+              
+              const controlsHtml = isTeacher ? '' : `
+                <div style="display: flex; gap: 4px; align-items:center;">
+                  <button onclick="toggleStudentPermission(${m.uid}, 'mic', ${!m.micAllowed})" class="roster-perm-btn ${micClass}">${micIcon}</button>
+                  <button onclick="toggleStudentPermission(${m.uid}, 'video', ${!m.videoAllowed})" class="roster-perm-btn ${videoClass}">${videoIcon}</button>
+                  <button onclick="toggleSpotlight(${m.uid}, ${!m.spotlight})" class="roster-perm-btn ${spotlightClass}" title="Spotlight/Pin Stream">${m.spotlight ? '📌' : '📍'}</button>
+                  <button onclick="kickStudent(${m.uid})" class="roster-perm-btn blocked" title="Kick Out" style="background:rgba(239, 68, 68, 0.25);">🚫</button>
+                </div>
+              `;
+
+              activeHtml += `
+                <div class="roster-item">
+                  <div class="roster-left">
+                    <div class="avatar" style="${isTeacher ? 'background:var(--cyan)' : ''}">${avatarLetter}</div>
+                    <span class="roster-name">${m.name} ${m.uid === myUid ? '(You)' : ''} ${m.handRaised ? '✋' : ''}</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="roster-role ${roleClass}">${roleLabel}</span>
+                    ${controlsHtml}
+                  </div>
+                </div>
+              `;
+            }
+          }
+        } // end for...of data.mappings
+
+        if (role === 'publisher' && rosterList) {
+          rosterList.innerHTML = '';
+          if (waitingCount > 0) {
+            rosterList.innerHTML += `
+              <div style="margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 4px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--warning); letter-spacing: 0.5px;">WAITING ROOM (${waitingCount})</span>
+              </div>
+              ${waitingHtml}
+            `;
+          }
+          rosterList.innerHTML += `
+            <div style="margin-top: 12px; margin-bottom: 8px;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px;">ADMITTED PARTICIPANTS</span>
+            </div>
+            ${activeHtml}
+          `;
+          document.getElementById('tabRoster').textContent = `Students (${activeStudents})`;
+        }
+
+      } catch (err) {
+        console.warn('Roster poll error:', err.message);
+      }
+    }
+
+    async function toggleStudentPermission(uid, type, allowed) {
+      if (role !== 'publisher') return;
+      
+      try {
+        await fetch(`${BACKEND_URL}/api/classroom/toggle-permission`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelName, uid, type, allowed })
+        });
+        
+        // Instant refresh roster
+        pollRosterNames();
+      } catch (err) {
+        console.error('Failed to toggle permission:', err);
+      }
+    }
+
+    async function approveStudent(uid) {
+      if (role !== 'publisher') return;
+      try {
+        await fetch(`${BACKEND_URL}/api/classroom/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelName, uid })
+        });
+        pollRosterNames();
+      } catch (err) {
+        console.error('Failed to approve student:', err);
+      }
+    }
+
+    async function kickStudent(uid) {
+      if (role !== 'publisher') return;
+      if (!confirm("Are you sure you want to kick this student out?")) return;
+      try {
+        await fetch(`${BACKEND_URL}/api/classroom/kick`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelName, uid })
+        });
+        pollRosterNames();
+      } catch (err) {
+        console.error('Failed to kick student:', err);
+      }
+    }
+
+    async function toggleSpotlight(uid, makeSpotlight) {
+      if (role !== 'publisher') return;
+      try {
+        await fetch(`${BACKEND_URL}/api/classroom/spotlight`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelName, uid: makeSpotlight ? uid : null })
+        });
+        pollRosterNames();
+      } catch (err) {
+        console.error('Failed to spotlight student:', err);
+      }
+    }
+
+    async function sendHeartbeat() {
+      try {
+        await fetch(`${BACKEND_URL}/api/classroom/heartbeat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelName, uid: myUid })
+        });
+      } catch (err) {
+        console.warn('Heartbeat error:', err);
+      }
+    }
+
+    let recognition = null;
+    function startSpeechToText() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        console.warn("Speech Recognition API not supported in this browser.");
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = async (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+
+        const showText = finalTranscript || interimTranscript;
+        if (showText.trim()) {
+          const ccArea = document.getElementById('closedCaptionsArea');
+          const ccText = document.getElementById('closedCaptionsText');
+          if (ccArea && ccText) {
+            ccArea.style.display = 'block';
+            ccText.textContent = `${displayName}: ${showText}`;
+          }
+        }
+
+        if (finalTranscript.trim()) {
+          try {
+            await fetch(`${BACKEND_URL}/api/classroom/transcript`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                channelName,
+                sender: displayName,
+                text: finalTranscript.trim()
+              })
+            });
+          } catch (err) {
+            console.warn('Failed to send transcript:', err);
+          }
+        }
+      };
+
+      recognition.onend = () => {
+        if (localTracks.audioTrack && !isMuted) {
+          try { recognition.start(); } catch(e) {}
+        } else {
+          const ccArea = document.getElementById('closedCaptionsArea');
+          if (ccArea) ccArea.style.display = 'none';
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch (err) {
+        console.warn('Speech recognition start error:', err);
+      }
+    }
+
+    async function generateAISummary() {
+      const summaryResult = document.getElementById('summaryResult');
+      if (!summaryResult) return;
+      
+      summaryResult.textContent = "Analyzing transcripts and generating AI summary. Please wait...";
+      
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/classroom/summarize`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelName })
+        });
+        const data = await res.json();
+        
+        if (data.summary) {
+          summaryResult.textContent = data.summary;
+        } else if (data.error) {
+          summaryResult.textContent = "Error generating summary: " + data.error;
+        } else {
+          summaryResult.textContent = "Unknown error occurred.";
+        }
+      } catch (err) {
+        console.error('Failed to generate summary:', err);
+        summaryResult.textContent = "Failed to communicate with server: " + err.message;
+      }
+    }
+
+    window.onload = initLobby;
+  </script>
+</body>
+</html>
