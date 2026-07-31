@@ -10,6 +10,39 @@ const fetch = require('node-fetch');
 const { connectDB, models, getIsConnected } = require('./db');
 const { RtcTokenBuilder, RtcRole } = require('agora-token');
 
+// ─────────────────────────────────────────────────────────────
+// CLOUDINARY + MULTER  (Video file upload for recordings)
+// ─────────────────────────────────────────────────────────────
+const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Helper: stream a Buffer to Cloudinary and resolve with the result
+function uploadBufferToCloudinary(buffer) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: 'video', folder: 'mpulse-recordings' },
+      (error, result) => { if (error) reject(error); else resolve(result); }
+    );
+    stream.end(buffer);
+  });
+}
+
+// Multer: keep file in RAM, 100 MB cap, video mimetypes only
+const videoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith('video/')) cb(null, true);
+    else cb(new Error('Only video files are allowed.'));
+  },
+});
+
 
 const app = express();
 connectDB();
@@ -1091,29 +1124,64 @@ app.post('/api/admin/schedule-class', async (req, res) => {
   }
 });
 
-// 5. Admin LMS - Upload Recording
-app.post('/api/admin/upload-recording', async (req, res) => {
-  try {
-    const { adminKey, title, videoUrl } = req.body;
-    if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
-      return res.status(403).json({ error: 'Unauthorized.' });
-    }
-    if (!title || !videoUrl) {
-      return res.status(400).json({ error: 'All fields are required.' });
-    }
+// 5. Admin LMS - Upload Recording (file OR URL)
+app.post(
+  '/api/admin/upload-recording',
+  // Step 1: run multer — wrap errors so we always return JSON
+  (req, res, next) => {
+    videoUpload.single('videoFile')(req, res, (err) => {
+      if (err) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(413).json({ error: 'File too large. Maximum allowed size is 100 MB.' });
+        }
+        return res.status(400).json({ error: err.message || 'File upload error.' });
+      }
+      next();
+    });
+  },
+  // Step 2: business logic
+  async (req, res) => {
+    try {
+      const { adminKey, title, videoUrl } = req.body;
 
-    if (!getIsConnected()) {
-      return res.status(503).json({ error: 'Database connection unavailable.' });
-    }
+      if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
+        return res.status(403).json({ error: 'Unauthorized.' });
+      }
+      if (!title) {
+        return res.status(400).json({ error: 'Recording title is required.' });
+      }
+      if (!getIsConnected()) {
+        return res.status(503).json({ error: 'Database connection unavailable.' });
+      }
 
-    const newRec = new models.Recording({ title, videoUrl });
-    await newRec.save();
-    res.json({ success: true, message: 'Class recording saved.' });
-  } catch (err) {
-    console.error('upload-recording error:', err);
-    res.status(500).json({ error: 'Failed to upload recording.' });
+      let finalUrl;
+      let sourceType;
+
+      if (req.file) {
+        // ── FILE PATH: upload buffer to Cloudinary ──
+        console.log(`Uploading to Cloudinary: ${req.file.originalname} (${(req.file.size / 1024 / 1024).toFixed(1)} MB)`);
+        const result = await uploadBufferToCloudinary(req.file.buffer);
+        finalUrl   = result.secure_url;
+        sourceType = 'file';
+        console.log(`✅ Cloudinary upload done: ${finalUrl}`);
+      } else if (videoUrl) {
+        // ── URL PATH: save pasted URL directly ──
+        finalUrl   = videoUrl;
+        sourceType = 'url';
+      } else {
+        return res.status(400).json({ error: 'Either a video file or a video URL is required.' });
+      }
+
+      const newRec = new models.Recording({ title, videoUrl: finalUrl, sourceType });
+      await newRec.save();
+      res.json({ success: true, message: 'Class recording saved.', videoUrl: finalUrl });
+
+    } catch (err) {
+      console.error('upload-recording error:', err);
+      res.status(500).json({ error: 'Failed to upload recording.' });
+    }
   }
-});
+);
 
 // 6. Admin LMS - Upload Study Resource
 app.post('/api/admin/upload-resource', async (req, res) => {

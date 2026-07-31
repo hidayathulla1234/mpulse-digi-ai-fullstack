@@ -816,16 +816,81 @@
           
           <hr style="border:none; border-bottom:1px solid var(--border); margin:24px 0;">
           
-          <h3 style="font-family:'Outfit',sans-serif; margin-bottom:18px;">Publish Recording &amp; Resources</h3>
-          <div class="form-group" style="margin-bottom:12px;">
+          <h3 style="font-family:'Outfit',sans-serif; margin-bottom:14px;">Publish Recording &amp; Resources</h3>
+
+          <!-- Recording Title (shared by both tabs) -->
+          <div class="form-group" style="margin-bottom:14px;">
             <label style="font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:4px;">Recording Title</label>
-            <input type="text" id="lmsRecTitle" placeholder="e.g. Lesson 1 Replay" style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:#fff;">
+            <input type="text" id="lmsRecTitle" placeholder="e.g. Lesson 1 Replay"
+              style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:#fff;">
           </div>
-          <div class="form-group" style="margin-bottom:16px;">
+
+          <!-- Tab switcher -->
+          <div id="recTabBar" style="display:flex; gap:0; margin-bottom:14px; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
+            <button id="recTabFile" onclick="switchRecTab('file')"
+              style="flex:1; padding:9px 0; font-size:12px; font-weight:700; cursor:pointer;
+                     background:var(--violet); color:#fff; border:none;">
+              📁 Upload Video File
+            </button>
+            <button id="recTabUrl" onclick="switchRecTab('url')"
+              style="flex:1; padding:9px 0; font-size:12px; font-weight:700; cursor:pointer;
+                     background:var(--surface); color:var(--muted); border:none; border-left:1px solid var(--border);">
+              🔗 Paste Video URL
+            </button>
+          </div>
+
+          <!-- FILE UPLOAD PANEL -->
+          <div id="recPanelFile" style="margin-bottom:14px;">
+            <label style="font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:6px;">
+              Video File <span style="font-weight:400;">(MP4, MOV, WebM — max 100 MB)</span>
+            </label>
+            <!-- Drop zone -->
+            <label id="recFileDropZone"
+              style="display:flex; flex-direction:column; align-items:center; justify-content:center;
+                     border:2px dashed var(--border); border-radius:10px; padding:22px 16px;
+                     cursor:pointer; transition:border-color .2s, background .2s; gap:6px;"
+              onmouseover="this.style.borderColor='var(--violet)';this.style.background='rgba(139,92,246,.07)'"
+              onmouseout="this.style.borderColor='var(--border)';this.style.background='transparent'">
+              <span style="font-size:28px;">🎬</span>
+              <span id="recFileLabel" style="font-size:13px; font-weight:600; color:#fff;">Click to choose or drag &amp; drop</span>
+              <span style="font-size:11px; color:var(--muted);">MP4 · MOV · WebM · AVI · MKV</span>
+              <input type="file" id="lmsRecFile" accept="video/*" style="display:none"
+                onchange="handleRecFileChange(this)">
+            </label>
+
+            <!-- Progress bar (hidden until upload starts) -->
+            <div id="recProgressWrap" style="display:none; margin-top:10px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span id="recProgressLabel" style="font-size:11px; color:var(--muted);">Uploading…</span>
+                <span id="recProgressPct" style="font-size:11px; font-weight:700; color:var(--violet);">0%</span>
+              </div>
+              <div style="background:var(--surface); border-radius:99px; height:6px; overflow:hidden;">
+                <div id="recProgressBar"
+                  style="height:100%; width:0%; background:linear-gradient(90deg,#8b5cf6,#06b6d4);
+                         border-radius:99px; transition:width .3s ease;"></div>
+              </div>
+              <p id="recCloudinaryNote" style="display:none; font-size:11px; color:var(--muted); margin-top:6px; font-style:italic;">
+                ☁️ File received — processing &amp; uploading to cloud storage…
+              </p>
+            </div>
+          </div>
+
+          <!-- URL PANEL (hidden by default) -->
+          <div id="recPanelUrl" style="display:none; margin-bottom:14px;">
             <label style="font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:4px;">Video Embed URL / Link</label>
-            <input type="text" id="lmsRecUrl" placeholder="e.g. https://youtube.com/..." style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:#fff;">
+            <input type="text" id="lmsRecUrl" placeholder="e.g. https://youtube.com/..."
+              style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:#fff;">
+            <p style="font-size:11px; color:var(--muted); margin-top:6px;">Supports YouTube, Vimeo, Google Drive, Loom, or any direct video link.</p>
           </div>
-          <button onclick="uploadRecording()" style="background:var(--violet); color:#fff; border:none; padding:10px 20px; border-radius:8px; font-weight:700; cursor:pointer; margin-bottom:16px;">Post Replay</button>
+
+          <!-- Submit button -->
+          <button id="recSubmitBtn" onclick="uploadRecording()"
+            style="background:var(--violet); color:#fff; border:none; padding:10px 20px;
+                   border-radius:8px; font-weight:700; cursor:pointer; margin-bottom:16px;
+                   display:flex; align-items:center; gap:8px; transition:opacity .2s;">
+            <span id="recBtnIcon">☁️</span>
+            <span id="recBtnText">Upload &amp; Post Replay</span>
+          </button>
 
           <div style="height:10px;"></div>
 
@@ -1352,31 +1417,132 @@
       });
     }
 
+    // ── Recording tab switcher ─────────────────────────────────────────
+    let recActiveTab = 'file';
+
+    function switchRecTab(tab) {
+      recActiveTab = tab;
+      const isFile = tab === 'file';
+      document.getElementById('recPanelFile').style.display = isFile ? 'block' : 'none';
+      document.getElementById('recPanelUrl').style.display  = isFile ? 'none'  : 'block';
+      document.getElementById('recTabFile').style.background = isFile ? 'var(--violet)' : 'var(--surface)';
+      document.getElementById('recTabFile').style.color      = isFile ? '#fff' : 'var(--muted)';
+      document.getElementById('recTabUrl').style.background  = isFile ? 'var(--surface)' : 'var(--violet)';
+      document.getElementById('recTabUrl').style.color       = isFile ? 'var(--muted)' : '#fff';
+      document.getElementById('recBtnText').textContent = isFile ? 'Upload & Post Replay' : 'Post Replay';
+      document.getElementById('recBtnIcon').textContent = isFile ? '☁️' : '🚀';
+    }
+
+    function handleRecFileChange(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const mb = (file.size / 1024 / 1024).toFixed(1);
+      document.getElementById('recFileLabel').textContent = `✅ ${file.name} (${mb} MB)`;
+      document.getElementById('recFileDropZone').style.borderColor = 'var(--violet)';
+    }
+
+    // ── Main upload function ───────────────────────────────────────────
     function uploadRecording() {
-      const key = localStorage.getItem('mpulseAdminKey');
+      const key   = localStorage.getItem('mpulseAdminKey');
       const title = document.getElementById('lmsRecTitle').value.trim();
-      const videoUrl = document.getElementById('lmsRecUrl').value.trim();
 
-      if (!title || !videoUrl) {
-        alert('All fields are required.');
-        return;
-      }
+      if (!title) { alert('Recording title is required.'); return; }
 
-      fetch(`${BACKEND_URL}/api/admin/upload-recording`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ adminKey: key, title, videoUrl })
-      })
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) {
-          alert('Recording posted successfully!');
-          document.getElementById('lmsRecTitle').value = '';
-          document.getElementById('lmsRecUrl').value = '';
-        } else {
-          alert('Failed: ' + res.error);
+      if (recActiveTab === 'file') {
+        // ── FILE MODE: XHR for upload-progress tracking ──
+        const fileInput = document.getElementById('lmsRecFile');
+        const file = fileInput.files[0];
+        if (!file) { alert('Please select a video file.'); return; }
+
+        const sizeMB = file.size / 1024 / 1024;
+        if (sizeMB > 100) {
+          alert('File is too large (max 100 MB). Please compress the video first.');
+          return;
         }
-      });
+
+        const formData = new FormData();
+        formData.append('adminKey', key);
+        formData.append('title', title);
+        formData.append('videoFile', file);
+
+        // Show progress UI, disable button
+        document.getElementById('recProgressWrap').style.display = 'block';
+        document.getElementById('recSubmitBtn').disabled = true;
+        document.getElementById('recSubmitBtn').style.opacity = '0.6';
+        document.getElementById('recBtnText').textContent = 'Uploading…';
+
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.onprogress = (e) => {
+          if (!e.lengthComputable) return;
+          const pct = Math.round((e.loaded / e.total) * 100);
+          document.getElementById('recProgressBar').style.width = pct + '%';
+          document.getElementById('recProgressPct').textContent = pct + '%';
+          if (pct === 100) {
+            document.getElementById('recProgressLabel').textContent = 'Sent to server…';
+            document.getElementById('recCloudinaryNote').style.display = 'block';
+            document.getElementById('recBtnText').textContent = 'Processing…';
+          }
+        };
+
+        const resetUploadUI = () => {
+          document.getElementById('recSubmitBtn').disabled = false;
+          document.getElementById('recSubmitBtn').style.opacity = '1';
+          document.getElementById('recProgressWrap').style.display = 'none';
+          document.getElementById('recCloudinaryNote').style.display = 'none';
+          document.getElementById('recProgressBar').style.width = '0%';
+          document.getElementById('recProgressPct').textContent = '0%';
+          document.getElementById('recProgressLabel').textContent = 'Uploading…';
+          switchRecTab('file'); // resets button label
+        };
+
+        xhr.onload = () => {
+          resetUploadUI();
+          let res;
+          try { res = JSON.parse(xhr.responseText); } catch (e) { res = {}; }
+
+          if (xhr.status === 413) {
+            alert('File too large — maximum is 100 MB.');
+          } else if (res.success) {
+            alert('✅ Recording uploaded and posted successfully!');
+            document.getElementById('lmsRecTitle').value = '';
+            document.getElementById('lmsRecFile').value  = '';
+            document.getElementById('recFileLabel').textContent = 'Click to choose or drag & drop';
+            document.getElementById('recFileDropZone').style.borderColor = 'var(--border)';
+          } else {
+            alert('Failed: ' + (res.error || 'Unknown error.'));
+          }
+        };
+
+        xhr.onerror = () => {
+          resetUploadUI();
+          alert('Network error. Please check your connection and try again.');
+        };
+
+        xhr.open('POST', `${BACKEND_URL}/api/admin/upload-recording`);
+        xhr.send(formData);
+
+      } else {
+        // ── URL MODE: existing JSON behavior, unchanged ──
+        const videoUrl = document.getElementById('lmsRecUrl').value.trim();
+        if (!videoUrl) { alert('Please enter a video URL.'); return; }
+
+        fetch(`${BACKEND_URL}/api/admin/upload-recording`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminKey: key, title, videoUrl })
+        })
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) {
+            alert('Recording posted successfully!');
+            document.getElementById('lmsRecTitle').value = '';
+            document.getElementById('lmsRecUrl').value   = '';
+          } else {
+            alert('Failed: ' + res.error);
+          }
+        });
+      }
     }
 
     function uploadResource() {

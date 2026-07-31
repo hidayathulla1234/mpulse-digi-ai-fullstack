@@ -128,9 +128,10 @@ const LiveClass = mongoose.models.LiveClass || mongoose.model('LiveClass', liveC
 
 // 8. Recording Model
 const recordingSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  videoUrl: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
+  title:      { type: String, required: true },
+  videoUrl:   { type: String, required: true },
+  sourceType: { type: String, enum: ['file', 'url'], default: 'url' },
+  createdAt:  { type: Date, default: Date.now }
 });
 const Recording = mongoose.models.Recording || mongoose.model('Recording', recordingSchema);
 
